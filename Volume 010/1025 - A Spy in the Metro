@@ -1,0 +1,73 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+
+int dp[501][501], t[501];
+//dp[time][車站]=需等待時間
+bool has_train[501][501][2];//左0右1
+int main(){
+	int T,n;
+	int c = 1;
+	while (cin >> n,n){
+		memset(has_train, 0, sizeof(has_train));
+		memset(dp, 0, sizeof(dp));
+		memset(t, 0, sizeof(t));
+		cin >> T;
+		for (int i = 1; i < n; i++)
+			cin >> t[i];
+		int m1,m2,k;
+		cin >> m1;
+		for (int i = 1; i <= m1; i++){
+			cin >> k;
+			has_train[k][1][0] = 1;
+			int now = k;
+			for (int j = 1; j < n; j++){
+				now += t[j];
+				has_train[now][j + 1][0] = 1;
+			}
+		}
+		cin >> m2;
+		for (int i = 1; i <= m2; i++){
+			cin >> k;
+			has_train[k][n][1] = 1;
+			int now = k;
+			for (int j = n - 1; j >= 1; j--){
+				now += t[j];
+				has_train[now][j][1] = 1;
+			}
+		}
+		for (int i = 1; i < n; i++)dp[T][i] = 1e9;
+		dp[T][n] = 0;
+		for (int i = T - 1; i >= 0; i--)
+			for (int j = 1; j <= n; j++){
+				//3決策 
+				//#1 等一分鐘
+				dp[i][j] = dp[i + 1][j] + 1;
+				//t[j]是j~j+1站的時間 t[j-1]是j-1~j的時間
+				//#2 做右邊車
+				if (j < n&&has_train[i][j][0] && i + t[j] <= T)
+					dp[i][j] = min(dp[i][j], dp[i + t[j]][j + 1]);
+				//#3 做左邊車
+				if (j>1 && has_train[i][j][1] && i + t[j - 1] <= T)
+					dp[i][j] = min(dp[i][j], dp[i + t[j - 1]][j - 1]);
+			}
+		printf("Case Number %d: ", c++);
+		if (dp[0][1] >= T)puts("impossible");
+		else
+			printf("%d\n", dp[0][1]);
+	}
+}
