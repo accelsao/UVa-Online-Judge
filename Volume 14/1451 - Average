@@ -42,10 +42,10 @@ int main(){
 		int ansl, ansr;
 		for (int i = L; i <= n; i++){
 			int j = i - L;
-			while (head < tail&&cmp(func(q[tail - 1], j) - func(q[tail], j)) >= 0)
+			while (head < tail&&cmp(func(q[tail - 1],j) - func(q[tail],j)) >= 0)//刪除上凸點 點j右邊 點q[tail]左 若是上凸點 q[tail],j <q[tail-1],j 應刪除 
 				tail--;
 			q[++tail] = j;
-			while (head < tail && cmp(func(q[head + 1], i) - func(q[head], i)) >= 0)
+			while (head < tail && cmp(func(q[head + 1], i) - func(q[head], i)) >= 0)//找到斜率更大的切點
 				head++;
 			double tmp = func(q[head], i);
 			if (cmp(tmp - ans) > 0 || cmp(tmp - ans) == 0 && i - q[head] < ansr - ansl){//找平均最大 若一樣取長度小 起點編號從小開始
