@@ -1,3 +1,4 @@
+--------------------------BIT
 #include<iostream>
 #include<sstream>
 #include<algorithm>
@@ -64,6 +65,91 @@ int main(){
 				b -= query(a)-query(a-1);
 				update(a, b);
 			}
+		}
+	}
+}
+----------------------------------線段樹
+#include<iostream>
+#include<sstream>
+#include<algorithm>
+#include<iomanip>
+#include<cstdio>
+#include<cstdlib>
+#include<cctype>
+#include<map>
+#include<vector>
+#include<cmath>
+#include<queue>
+#include<cstring>
+#include<set>
+#include<functional>
+#include<list>
+#include<stack>
+#include<cstring>
+#include<utility>
+#include <climits>
+#include<unordered_map>
+using namespace std;
+#define printf printf_s
+#define sprintf sprintf_s
+#define sscanf sscanf_s
+#define scanf scanf_s
+
+int p[200010];
+int node[400010] = {};
+void build(int L, int R, int i){
+	if (L == R){
+		node[i] = p[L];
+		return;
+	}
+	int M = (L + R) >> 1;
+	build(L, M, i << 1);
+	build(M + 1, R, (i << 1) + 1);
+	node[i] = node[i << 1] + node[(i << 1) + 1];
+}
+void update(int L, int R, int i,int x,int n){
+	if (L == R){
+		node[i] = n;
+		return;
+	}
+	int M = (L + R) /2;
+	if(x<=M)update(L, M, i << 1,x,n);
+	if(x>M)update(M + 1, R, (i << 1) + 1,x,n);
+	node[i] = node[i << 1] + node[(i << 1) + 1];
+}
+int tot;// 查詢範圍[x1,x2]並且累計總和
+void query(int L, int R, int i,int x1,int x2){
+	if (x1 <= L&&x2 >= R) { //L,R 在要查詢的範圍之間 
+		tot += node[i];
+		return;
+	}
+	int M = (L + R) / 2;
+	if (x1 <= M)query(L, M, i <<1,x1,x2);
+	if (x2>M)query(M + 1, R, (i << 1) + 1,x1,x2);
+}
+	int tt = 0;
+int main(){
+	int n;
+
+	while (cin >> n,n){
+		tt++;
+		for (int i = 0; i < n; i++)
+			cin >> p[i];
+		build(0, n - 1, 1);
+		if (tt != 1)puts("");
+		printf("Case %d:\n", tt);
+		string s;
+		int a, b;
+		while (cin >> s, s != "END"){
+			tot = 0;
+			cin >> a >> b;
+			
+			if (s == "M"){
+				query(0, n - 1, 1, a-1, b-1);
+				cout << tot << endl;
+			}
+			else
+				update(0, n - 1, 1, a-1, b);
 		}
 	}
 }
