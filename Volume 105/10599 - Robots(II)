@@ -1,0 +1,97 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+using namespace std;
+
+int main() {
+	int n, m;
+	int i, j, k;
+	int x, y;
+	int g[105][105];
+	int cases = 0;
+	int ret[10005];
+	while (cin >> n >> m && n > 0) {
+		for (int i = 0; i <= n + 1; i++)
+			for (int j = 0; j < m + 1; j++)
+				g[i][j] = 0;
+		while (cin >> x >> y && x > 0)
+			g[x][y] = 1;
+		int nextL[105][105], nextD[105][105];
+		//(n,m)
+		//nextL[]每個位置最右邊的G y座標 若無則為m+1
+		//nextD[]每個位置右下的X坐標
+		for (i = 1; i <= n; i++) {
+			int next = m + 1;
+			for (j = m; j >= 1; j--) {
+				nextL[i][j] = next;
+				if (g[i][j]) next = j;
+			}
+		}
+		for (j = 1; j <= m; j++) {
+			int next = n + 1;
+			for (i = n; i >= 1; i--) {
+				nextD[i][j] = next;
+				
+				if (nextL[i][j] >= j && nextL[i][j] <= m || g[i][j])
+					next = i;
+			}
+		}
+		//dp1[]幾個G //dp2[]幾個走法
+		int dp1[105][105] = {}, dp2[105][105] = {};// max, path
+		int arg[105][105][2];
+		for (int i = 0; i < 105; i++)
+			for (int j = 0; j < 105; j++)
+				for (int k = 0; k < 2; k++)
+					arg[i][j][k] = -1;
+		for (i = 1; i <= n; i++) {
+			for (j = 1; j <= m; j++) {
+				if (g[i][j] == 0)    continue;
+				if (dp1[i][j] == 0)  dp1[i][j] = 1, dp2[i][j] = 1;
+				x = i;
+				//printf("%d %d ---- %d %d\n", i, j, dp1[i][j], dp2[i][j]);
+				while (x <= n) {
+					if (g[x][j] == 0 || x == i)
+						y = nextL[x][j];
+					else
+						y = j;
+					//printf("%d %d\n", x, y);
+					if (dp1[x][y] < dp1[i][j] + 1) {
+						dp1[x][y] = dp1[i][j] + 1, dp2[x][y] = 0;
+						arg[x][y][0] = i;
+						arg[x][y][1] = j;
+					}
+					if (dp1[x][y] == dp1[i][j] + 1)
+						dp2[x][y] += dp2[i][j];
+					x = nextD[x][j];//右邊有G的X
+				}
+			}
+		}
+		int mx = 0, path;
+		int rx, ry;
+		for (i = 1; i <= n; i++) {
+			for (j = 1; j <= m; j++) {
+				if (dp1[i][j] > mx)
+					mx = dp1[i][j], path = 0, rx = i, ry = j;
+				if (dp1[i][j] == mx)
+					path += dp2[i][j];
+			}
+		}
+		int idx = 0;
+		while (rx != -1 && ry != -1) {
+			ret[idx++] = (rx - 1)*m + (ry - 1) + 1;
+			x = arg[rx][ry][0];
+			y = arg[rx][ry][1];
+			rx = x, ry = y;
+		}
+		printf("CASE#%d: %d %d", ++cases, mx, path);
+		for (i = idx - 1; i >= 0; i--)
+			printf(" %d", ret[i]);
+		puts("");
+	}
+}
+
+參考http://mypaper.pchome.com.tw/zerojudge/post/1325080331
