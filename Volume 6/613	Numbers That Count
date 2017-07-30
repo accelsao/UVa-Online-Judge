@@ -1,0 +1,58 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+using namespace std;
+
+
+map<string, int> rec;
+bool loop;
+
+int inv(string s, int l) {
+	if (l >= 15) {
+		return l;
+	}
+	int cnt[10] = {};
+	for (int i = 0; s[i]; i++) {
+		cnt[s[i] - '0']++;
+	}
+	string invs;
+	char temp[99];
+	for (int i = 0; i < 10; i++) 
+		if (cnt[i]) {
+			int t = cnt[i];
+			int p = 0;
+			while (t){
+				temp[p++] = (t % 10)+'0';
+				t /= 10;
+			}
+			while (p--)
+				invs += temp[p];
+			invs += i+'0';
+		}
+	loop = rec.count(invs);
+	rec[s] = l;
+	if (loop) 
+		return l - rec[invs] + 1;
+	return (invs == s) ? l : inv(invs, l + 1);
+}
+
+int main() {
+	string s;
+	while (cin>>s && s[0] != '-') {
+		rec.clear();
+		loop =0;
+		int len = inv(s, 0);
+		cout << s;
+		if (len >= 15) 
+			printf(" can not be classified after 15 iterations\n");
+		else if (len && loop) 
+			printf(" enters an inventory loop of length %d\n",len);
+		else if (len) 
+			printf(" is self-inventorying after %d steps\n",  len);
+		else 
+			printf(" is self-inventorying\n");
+	}
+}
