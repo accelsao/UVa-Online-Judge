@@ -61,3 +61,5 @@ int main(){
 		if (t)cout << endl;
 	}
 }
+
+dp 走格子路徑方法數 有障礙物
