@@ -73,3 +73,5 @@ int main(){
 		cout << t << endl;
 	}
 }
+
+ 最大矩形面積 stack
