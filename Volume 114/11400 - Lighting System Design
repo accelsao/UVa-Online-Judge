@@ -1,0 +1,41 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+struct light{
+	int v, k, c, l;
+	bool operator <(const light &a)const{
+		return v < a.v;
+	}
+}p[1001];
+
+int n;
+int s[1001] = {};
+int d[1001];
+
+int main(){
+	while (cin >> n, n){
+		for (int i = 1; i <= n; i++)
+			cin >> p[i].v >> p[i].k >> p[i].c >> p[i].l;
+		sort(p + 1, p + n + 1);
+		s[0] = d[0] = 0;
+		for (int i = 1; i <= n; i++) s[i] = s[i - 1] + p[i].l, d[i] = 1e9;
+		for (int i = 1; i <= n; i++)
+			for (int j = 0; j <= i; j++)
+				d[i] = min(d[i], d[j] + p[i].k + (s[i] - s[j])*p[i].c);
+		cout << d[n] << endl;
+	}
+}
