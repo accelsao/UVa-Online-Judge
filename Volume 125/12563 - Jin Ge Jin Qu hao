@@ -1,0 +1,38 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+int p[51];
+int dp[51 * 180 + 678];
+int main(){
+	int t; cin >> t;
+	int n, T;
+	for (int i = 1; i <= t;i++){
+		memset(dp, 0x8f, sizeof(dp));
+		cin >> n >> T;
+		for (int i = 0; i < n; i++)
+			cin >> p[i];
+		dp[0] = 0;
+		for (int i = 0; i < n; i++)
+			for (int j = T - 1; j >= p[i]; j--)
+				dp[j] = max(dp[j - p[i]] + 1, dp[j]);
+		int ans;
+		for (int j = ans = T - 1; j >= 0; j--)
+			if (dp[j]>dp[ans])
+				ans = j;
+		printf("Case %d: %d %d\n", i, dp[ans]+1,ans+ 678);
+	}
+}
