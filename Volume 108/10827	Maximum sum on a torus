@@ -1,0 +1,98 @@
+------------------------------------------------o(n^4)
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+
+int t;
+int m[300][300] = {};
+int main(){
+	cin >> t;
+	while (t--){
+		int n;
+		cin >> n;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++){
+				cin >> m[i][j];
+				m[i + n][j] = m[i][j + n] = m[i + n][j + n] = m[i][j];
+			}
+		int ans = -1e9;
+
+		for (int i = 0; i < n; i++)
+			for(int j = 0; j < n; j++){
+				int s[300] = {};
+				for (int k = i; k < n + i; k++){
+					int sum = 0;
+						for (int t = j; t  < n+j; t++){
+							s[t] += m[k][t];
+							sum += s[t];
+							ans = max(ans,sum);
+						}
+				}
+			}
+		cout << ans << endl;
+	}
+}
+--------------------------------------------o(n^4)
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+
+int t;
+int m[300][300] = {};
+int main(){
+	cin >> t;
+	while (t--){
+		int n;
+		cin >> n;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++){
+				cin >> m[i][j];
+				m[i + n][j]=m[i][j];
+			}
+		//循環單行 max(max ,total-min)  total-min 相當循環中最大的和  (全部扣掉最小的那串->剩下的可成一環)
+		int ans = -1e9;
+		for (int  k= 0; k < n; k++)	
+			for (int i = k; i - k < n; i++){
+				int s[301] = {};
+				for (int j = i; j < k + n; j++){
+					for (int d = 0; d < n; d++)
+						s[d] += m[j][d];
+					int ans1 = -1e9;
+					int s1 = 0;
+					int tot = 0;
+					for (int i = 0; i < n; i++){
+						if (s1 >= 0)s1 += s[i];
+						else s1 = s[i];
+						ans1 = max(ans1, s1);
+						tot += s[i];
+					}
+					int ans2 = 1e9;
+					int s2 = 0;
+					for (int i = 1; i < n; i++){
+						if (s2<=0)s2 += s[i];
+						else s2 = s[i];
+						ans2 = min(ans2, s2);
+					}
+					ans = max(ans,max(ans1, tot-ans2));
+				}
+			}
+		
+		cout << ans << endl;
+	}
+}
