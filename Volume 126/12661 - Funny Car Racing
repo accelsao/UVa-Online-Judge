@@ -1,0 +1,79 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+#define M 501
+int n, m, s, t;
+struct edge{
+	int to, dis, a, b;
+	edge(){}
+	edge(int a, int b, int c, int d) :to(a), dis(b), a(c), b(d){}
+};
+vector<int>g[M];
+vector<edge>p;
+int d[M];
+bool inq[M];
+void spfa(){
+	for (int i = 1; i <= n; i++){
+		d[i] = 1e9;
+		inq[i] = 0;
+	}
+	d[s] = inq[0] = 0;
+	//d[i] s到i的最短time
+	queue<int>q; q.push(s);
+	while (!q.empty()){
+		int u = q.front(); q.pop();
+		inq[u] = 0;
+		for (int i = 0; i < g[u].size(); i++){
+			edge e = p[g[u][i]];
+			int v = e.to,w=e.dis,a=e.a,b=e.b;
+			if (a < w)continue;
+			int now = d[u] % (a + b);//d[u] 取一個循環
+			if (now + w <= a){//直接通過 d[u]+w
+				if (d[v] > d[u] + w){
+					d[v] = d[u] + w;
+					if (!inq[v]){
+						inq[v] = 1; q.push(v);
+					}
+				}
+			}
+			else{//已關閉或中途關閉 d[u]+w +wait(a+b-now)
+				int tmp = d[u] + w + (a + b) - now;
+				if (d[v]>tmp){
+					d[v] = tmp;
+					if (!inq[v]){
+						inq[v] = 1; q.push(v);
+					}
+				}
+			}
+		}
+	}
+}
+int main(){
+	int ts=1;
+	while (cin >> n >> m >> s >> t){
+		for (int i = 1; i <= n; i++)g[i].clear(); p.clear();
+		int now = 0;
+		for (int i = 0; i < m; i++){
+			int u, v, a, b, tt;
+			cin >> u >> v >> a >> b >> tt;
+			p.push_back(edge(v, tt, a, b));
+			g[u].push_back(now++);
+		}
+		spfa();
+		printf("Case %d: %d\n", ts++, d[t]);
+	}
+}
