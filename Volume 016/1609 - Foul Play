@@ -1,0 +1,76 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+#define M 1052
+char a[M][M];
+int main(){
+	int n;
+	while (cin >> n){
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+				cin >> a[i][j];
+		vector<int>win, lose;
+		for (int i = 2; i <= n; i++)
+			if (a[1][i] == '1')
+				win.push_back(i);
+			else 
+				lose.push_back(i);
+		int num = n;
+		while (num >=2){
+			vector<int>ww, ll, final;
+			//黑色隊 1會輸的
+			for (int i = 0; i < lose.size(); i++){
+				int tlose = lose[i];
+				bool matched = 0;
+				//灰色隊 1贏的 可能贏黑的
+				for (int j = 0; j < win.size(); j++){
+					int &twin = win[j];
+					//灰贏黑
+					if (twin >= 1 && a[twin][tlose] == '1'){
+						printf("%d %d\n", twin, tlose);
+						ww.push_back(twin);//灰贏黑的隊
+						twin = 0;
+						matched = 1;
+						break;
+					}
+				}
+				if (!matched)final.push_back(tlose);
+			}
+			bool first = 1;
+			for (int i = 0; i < win.size(); i++){
+				int twin = win[i];
+				if (twin>=1)
+					if (first){
+						printf("1 %d\n", twin);
+						first = 0;
+					}
+					else final.push_back(twin);
+			}
+			for (int i = 0; i < final.size(); i += 2){
+				printf("%d %d\n", final[i], final[i + 1]);
+				int k = final[i];
+				if (a[final[i + 1]][k] == '1')
+					k = final[i + 1];
+				if (a[1][k] == '1')ww.push_back(k);
+				else ll.push_back(k);
+			}
+			win = ww;
+			lose = ll;
+			num >>=1;
+		}
+	}
+}
