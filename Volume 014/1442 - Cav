@@ -1,0 +1,37 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+#define M 1050000
+int p[M], s[M];
+int l[M], r[M];
+int main(){
+	int t,n,k;
+	cin >> t;
+	while (t--){
+		cin >> n;
+		for (int i = 0; i < n; i++)cin >> p[i];
+		for (int i = 0; i < n; i++)cin >> s[i];
+		for (int i = n - 1, k = 1e9; i >= 0; k = r[i--])
+			r[i] = max(min(k, s[i]), p[i]);
+		for (int i = 0, k = 1e9; i < n; k = l[i++])
+			l[i] = max(min(k, s[i]), p[i]);
+		int ans = 0;
+		for (int i = 0; i < n; i++)
+			ans += min(r[i], l[i]) - p[i];
+		printf("%d\n", ans);
+	}
+}
