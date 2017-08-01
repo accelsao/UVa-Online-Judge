@@ -1,0 +1,34 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+
+int main(){
+	int n, W;
+	int y1, y2, dis;
+	bool ok;
+
+	while (cin>>n)
+		while(n--){
+			cin >> W;
+			ok = true;
+			if (W){
+				cin >> y1 >> y2;
+				dis = y1 - y2;
+				for (int j = 1; j < W; j++){
+					cin >> y1 >> y2;
+					if (y1 - y2 != dis) ok = false;
+				}
+			}
+			if (ok) printf("yes\n");
+			else printf("no\n");
+			if (n) printf("\n");
+		}
+}
