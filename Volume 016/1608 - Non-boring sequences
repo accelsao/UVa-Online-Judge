@@ -1,0 +1,57 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+#define M 200010
+int p[M],l[M],r[M];
+bool solve(int L, int R){
+	if (L >= R)return 1;
+	for (int i = 0; i <= (R - L) / 2; i++){
+		if (l[L + i]<L&&r[L + i]>R)
+			return solve(L, L + i - 1) && solve(L + i + 1, R);
+		if (l[R - i]<L&&r[R - i]>R)
+			return solve(L, R - i - 1) && solve(R - i + 1, R);
+	}
+	return 0;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--){
+		int n;
+		cin >> n;
+		for (int i = 0; i < n; i++)
+			cin >> p[i];
+		map<int, int>m;
+		for (int i = 0; i < n; i++){
+			if (!m.count(p[i]))
+				l[i] = -1;
+			else l[i] = m[p[i]];
+			m[p[i]] = i;
+		}
+		m.clear();
+		for (int i = n-1; i >=0; i--){
+			if (!m.count(p[i]))
+				r[i] = n;
+			else r[i] = m[p[i]];
+			m[p[i]] = i;
+		}
+		if (solve(0, n - 1))
+			puts("non-boring");
+		else
+			puts("boring");
+	}
+}
