@@ -1,0 +1,70 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+const int maxn = 100005;
+int s, n, tot;
+int x[maxn * 3], cnt[maxn], ok[maxn * 2];
+
+void solve(){
+	for (int i = 0; i < n + s + 1; i++) {
+		if (tot == s)  // 完整的窗口  
+			ok[i] = 1;
+		if (i < s && tot == i) // 刚开始左侧窗口不完整  
+			ok[i] = 1;
+		if (i > n && tot == n + s - i)  // 结束的时候右侧的窗口不完整  
+			ok[i] = 1;
+		// 为下一次滑动窗口更新cnt和tot  
+		if (i == n + s)  // 滑到头了  
+			break;
+		if (x[i] != -1 && --cnt[x[i]] == 0)  // 删掉第一个  
+			tot--;
+		if (x[i + s] != -1 && cnt[x[i + s]]++ == 0)  // 增加一个  
+			tot++;
+	}
+}
+
+int main(){
+	int T;
+	cin >> T;
+	while (T--) {
+		cin >> s >> n;
+		// 给每个数字左右都加一个-1  
+		fill(x, x + n + 2 * s, -1);
+		for (int i = 0; i < n; i++) 
+			cin >> x[i + s];
+		tot = 0; // 当前华东窗口有多少个不同的数字  
+		fill(cnt + 1, cnt + s + 1, 0);
+		// cnt[i]是i在当前滑动窗口的数量  
+		fill(ok, ok + n + s + 1, 0);
+		// 如果第i个滑动窗口没有一样的数字则ok[i] = 1  
+		solve();
+		int ans = 0;
+		// 检查每个可能的结果  
+		for (int i = 0; i < s; i++) {
+			int valid = 1;
+			// 所有窗口满足要求，这个结果才是可行的  
+			for (int j = i; j < n + s + 1; j += s) 
+				if (!ok[j]) 
+					valid = 0;
+			if (valid) 
+				ans++;
+		}
+		if (ans == n + 1) 
+			ans = s;
+		cout << ans << endl;
+	}
+}
