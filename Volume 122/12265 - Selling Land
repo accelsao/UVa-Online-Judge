@@ -1,0 +1,65 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+const int maxn = 1000 + 5;
+
+int T, n, m, tmp, l;
+int h[maxn];
+char a[maxn][maxn];
+map< int, int > M;
+
+int main(){
+	scanf("%d", &T);
+	while(T--){
+		M.clear();
+		memset(h, 0, sizeof(h));
+		scanf("%d%d", &n, &m);
+		for (int i = 1; i <= n; ++i)
+			for (int j = 1; j <= m; j++)
+				cin >> a[i][j];
+
+		for (int i = 1; i <= n; ++i){
+			for (int j = 1; j <= m; ++j)
+				if (a[i][j] == '.')
+					h[j]++;
+				else h[j] = 0;
+
+			stack< pair<int, int> > sta;
+			for (int j = 1; j <= m; ++j){
+				if (h[j]){
+					pair< int, int > cur(j, h[j]);
+					while (!sta.empty() && sta.top().second >= cur.second){
+						//如果高度更低 改變長度
+						cur.first = sta.top().first;
+						sta.pop();
+					}
+					//若 空 或 解>目前最優解 (若非則不用考慮)
+					if (sta.empty() || sta.top().second - sta.top().first < cur.second - cur.first)
+						sta.push(cur);
+					M[(j - sta.top().first + 1) + sta.top().second]++;
+					//矩形的 長度 j-(可行最左位置)+1  高度  (算周長再乘二)
+				}
+				else
+					while (!sta.empty())
+						sta.pop();
+						
+			}
+		}
+		for (map< int, int >::iterator it = M.begin(); it != M.end(); ++it)
+			printf("%d x %d\n", it->second, it->first * 2);
+	}
+}
