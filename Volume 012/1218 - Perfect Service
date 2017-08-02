@@ -33,7 +33,7 @@ int dp(int u,int  k,int f){
 			d[u][k] += dp(v[u][i], 2, u);
 	}
 	else{		
-		d[u][k] = 1e7;
+		d[u][k] = 1e7;//1e8 int 會溢位 要改成longlong
 		for (int i = 0; i < v[u].size(); i++)
 			if (v[u][i] != f)
 				d[u][k] = min(d[u][k], dp(u, 1, f) - dp(v[u][i], 2, u) + dp(v[u][i], 0, u));
