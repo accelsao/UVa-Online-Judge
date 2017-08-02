@@ -1,0 +1,50 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+#define M 1<<12
+int n, m;
+int d[M][M];
+int p[129];
+int cnt[M][M];//這個狀態的數量
+int dfs(int s, int a){
+	if (d[s][a] != 0x3f3f3f3f)return d[s][a];
+	if (cnt[s][a]<=1)return 0;//他是唯一 所以不用查詢
+	for (int i = 0; i < m; i++){
+		if (s&(1 << i))continue;
+		//d(s,a) 問了s 確認要求的有a時 最小詢問數
+		//max(d(s+{k},a+{k}),d(s+{k},a))+1 
+		d[s][a] = min(d[s][a], max(dfs(s | (1 << i), a | (1 << i)), dfs(s | (1 << i), a)));
+	}
+	//全部可能中取最小值
+	return d[s][a] += 1;
+}
+int main(){
+	while (cin >> m >> n, m){
+		memset(cnt, 0, sizeof(cnt));
+		memset(d, 0x3f, sizeof(d));
+		string s; getchar();
+		for (int i = 0; i < n; i++){
+			getline(cin, s); p[i] = 0;
+			for (int j = 0; j<m; j++)
+				if (s[j] - '0')
+					p[i] |= 1 << j;
+		}
+		for (int s = 0; s < (1 << m); s++)
+			for (int i = 0; i < n; i++)
+				cnt[s][p[i]&s]++;//[s][a為s的子集合] 預先處理以滿足的個數
+		printf("%d\n", dfs(0, 0));
+	}
+}
