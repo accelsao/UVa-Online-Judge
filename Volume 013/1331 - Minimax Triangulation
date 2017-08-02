@@ -1,0 +1,62 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+#define M 100
+#define eps 1e-6 //double 誤差
+struct point{
+	double x, y;
+}p[M];
+double dp[M][M];
+int n;
+double dis(int x, int y){
+	return sqrt((p[x].x - p[y].x)*(p[x].x - p[y].x) + (p[x].y - p[y].y)*(p[x].y - p[y].y));
+}
+double area(int x, int y, int z){
+	double a = dis(x, y), b = dis(y, z), c = dis(x, z);
+	double p = (a + b + c) / 2;
+	return sqrt(p*(p - a)*(p - b)*(p - c));
+}
+bool check(int x, int y, int z){
+	double t = area(x, y, z);
+	for (int i=0; i < n; i++){
+		if (i == x || i == y || i == z)continue;
+		double a = area(i, x, y),b=area(i,y,z),c=area(i,x,z);
+		if (fabs(a + b + c - t) < eps)return 0;//他在內部 所以不合法
+	}
+	return 1;
+}
+double solve(){
+	memset(dp, 0, sizeof(dp));
+	for (int i = n - 3; i >= 0; i--)
+		for (int j = i + 2; j < n; j++){
+			dp[i][j] = 1e9;
+			for (int k = i + 1; k < j; k++)
+				if (check(i, j, k))
+					dp[i][j] = min(max(max(area(i, j, k), dp[i][k]), dp[k][j]), dp[i][j]);
+		}
+	return dp[0][n - 1];
+}
+int main(){
+
+	int t;
+	cin >> t;
+	while (t--){
+		cin >> n;
+		for (int i = 0; i < n; i++)
+			cin >> p[i].x >> p[i].y;
+		printf("%.1f\n", solve());
+	}
+}
