@@ -1,0 +1,49 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+#define M 20+100+1
+#define S 8+1
+int c[M],st[M];//cost st[i]第i人能教的科目 集合
+int d[M][1 << S][1 << S];
+int m, n,s;
+//s1 1人教 s2 2人教
+int dp(int k, int s1, int s2){
+	if (k == m + n)return s2 == (1 << s) - 1 ? 0 : 1e9;//都教了就不用再花錢
+	int &ans = d[k][s1][s2];
+	if (ans >= 0)return ans;
+	ans = 1e9;
+	if (k >= m)ans = dp(k + 1, s1, s2);//不選
+	s2 |= (s1&st[k]);//老師能教且差一個 1到2
+	s1 |= st[k];//沒人教 有一個老師能教   0到1
+	ans = min(ans, c[k] + dp(k + 1, s1, s2));//選
+	return ans;
+}
+int main(){
+	while (cin >> s >> m >> n,s){
+		string t; getchar();
+		for (int i = 0; i < m + n; i++){
+			getline(cin, t);
+			int num;
+			stringstream ss(t);
+			ss >> num; c[i] = num;
+			st[i] = 0;
+			while (ss >> num)
+				st[i] |= (1 << num - 1);
+		}
+		memset(d, -1, sizeof(d));
+		printf("%d\n", dp(0, 0, 0));
+	}
+}
