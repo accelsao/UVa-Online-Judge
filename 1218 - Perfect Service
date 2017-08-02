@@ -1,0 +1,57 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+const int M =1e5 + 9;
+int n;
+vector<int>v[M];
+int d[M][3];
+int dp(int u,int  k,int f){
+	if (d[u][k] != -1)return  d[u][k];
+	if (!k){//是伺服器
+		d[u][k] = 1;
+		for (int i = 0; i < v[u].size(); i++)
+			if (v[u][i] != f)
+				d[u][k] += min(dp(v[u][i], 0, u), dp(v[u][i], 1, u));
+	}
+	else if (k == 1){
+		d[u][k] = 0;
+		for (int i = 0; i < v[u].size(); i++)
+			if (v[u][i]!=f)
+			d[u][k] += dp(v[u][i], 2, u);
+	}
+	else{		
+		d[u][k] = 1e7;
+		for (int i = 0; i < v[u].size(); i++)
+			if (v[u][i] != f)
+				d[u][k] = min(d[u][k], dp(u, 1, f) - dp(v[u][i], 2, u) + dp(v[u][i], 0, u));
+	}
+	return d[u][k];
+}
+int main(){
+	while (cin >> n){
+		int a, b;
+		for (int i = 1; i <= n; i++)v[i].clear();
+		for (int i = 1; i < n; i++){
+			cin >> a >> b;
+			v[a].push_back(b);
+			v[b].push_back(a);
+		}
+		int p; cin >> p;
+		memset(d, -1, sizeof(d));
+		printf("%d\n", min(dp(1,0,-1), dp(1,2,-1)));
+		
+	}
+}
