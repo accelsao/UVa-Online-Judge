@@ -1,0 +1,64 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+int n;
+string boss,employee;
+map<string, int>m;
+vector<int>v[201];
+int d[201][2], f[201][2];
+//d(u,0)以u為根 不選u的最大人數 d(u,1)以u為根 選u的最大人數
+//f(u,0)=1 方法唯一 否則 =0
+int dp(int u, int k){
+	f[u][k] = 1;
+	d[u][k] = k;
+	for (int i = 0; i < v[u].size(); i++){
+		if (k == 1){//選
+			d[u][k] += dp(v[u][i],0);//選u 他的子結點都不可選
+			if (!f[v[u][i]][0])f[u][k] = 0;//如果有任一個子結點不唯一 父結點不唯一
+		}
+		else{//不選
+			d[u][k] += max(dp(v[u][i], 0), dp(v[u][i], 1));//可選可不選
+			if (d[v[u][i]][0] == d[v[u][i]][1])f[u][k] = 0;//人數相等不唯一
+			//被選到的不唯一 則f(u,0)不唯一
+			else if (d[v[u][i]][0] > d[v[u][i]][1] && !f[v[u][i]][0])f[u][k] = 0;
+			else if (d[v[u][i]][0] < d[v[u][i]][1] && !f[v[u][i]][1])f[u][k] = 0;		
+		}
+	}
+	return d[u][k];
+}
+int main(){
+	while (cin >> n,n){
+		m.clear();
+		memset(d, 0, sizeof(d));
+		memset(f, 0, sizeof(f));
+		for (int i = 0; i <= n; i++)v[i].clear();
+		cin >> boss;
+		int num = 0;
+		m[boss] = num++;
+		for (int i = 1; i < n; i++){
+			cin >> employee >> boss;
+			if (!m.count(employee))m[employee] = num++;
+			if (!m.count(boss))m[boss] = num++;
+			v[m[boss]].push_back(m[employee]);
+		}
+		//老闆 選或不選的可能數
+		printf("%d ", max(dp(0, 0), dp(0, 1)));
+		bool unique = 0;
+		if (d[0][0] > d[0][1] && f[0][0])unique = 1;
+		else if (d[0][0] < d[0][1] && f[0][1])unique = 1;
+		puts(unique ? "Yes" : "No");
+	}
+}
