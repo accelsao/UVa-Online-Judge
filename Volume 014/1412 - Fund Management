@@ -1,0 +1,111 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+int  m, n, kk;
+double c,price[9][101];
+string name[9];
+int s[9], k[9];
+#define eps 1e-3
+vector<vector<int>>states;//狀態
+int opt[101][15000], pre[101][15000];//列印解
+map<vector<int>, int>ID;//給狀態編號
+int buy[15000][9], sell[15000][9];
+void dfs(int stock, vector<int>&lots, int totlot){//dfs建states
+	if (stock == n){
+		ID[lots] = states.size();
+		states.push_back(lots);
+	}
+	else
+		for (int i = 0; i <= k[stock] && totlot + i <= kk; i++){//在手中持有上限內
+			lots[stock] = i;
+			dfs(stock + 1, lots, totlot + i);
+		}
+}
+double d[101][15000];
+void init(){//states 預先計算可能狀態並編號
+	vector<int>lots(n);
+	states.clear(); ID.clear();
+	dfs(0, lots, 0);
+	for (int s = 0; s < states.size(); s++){//states所有持有股票的可能狀態
+		int totlot = 0;
+		for (int i = 0; i < n; i++)totlot += states[s][i];
+		for (int i = 0; i < n; i++){//股票的改變
+			buy[s][i] = sell[s][i] = -1;
+			if (states[s][i] < k[i] && totlot < kk){//可以買
+				vector<int>newstate = states[s];
+				newstate[i]++;
+				buy[s][i] = ID[newstate];//紀錄狀態編號
+			}
+			if (states[s][i] > 0){//賣
+				vector<int>newstate = states[s];
+				newstate[i]--;
+				sell[s][i] = ID[newstate];
+			}
+		}
+	}
+}
+void update(int day, int s, int s2, double v, int o){
+	if (v>d[day + 1][s2]){//一個操作後的錢比較多才執行
+		d[day + 1][s2] = v;
+		opt[day + 1][s2] = o;//最優策略
+		pre[day + 1][s2] = s;//上個狀態
+	}
+}
+double dp(){
+	for (int day = 0; day <= m; day++)
+		for (int s = 0; s < states.size(); s++)
+			d[day][s] = -1e30;
+	d[0][0] = c;//第0天0股票 c錢
+	for (int day = 0; day < m; day++)
+		for (int s = 0; s < states.size(); s++){
+			double v = d[day][s]; if (v < -1)continue;
+			update(day, s, s, v, 0);//不買不賣
+			for (int i = 0; i < n; i++){//o為股票號碼以正為買負為賣0為不買不賣
+				if (buy[s][i] >= 0 && v >= price[i][day]- eps)//v>=price[i][day](第day天時i的價格)
+					update(day, s, buy[s][i], v - price[i][day], i + 1);
+				if (sell[s][i] >= 0)
+					update(day, s, sell[s][i], v + price[i][day], -(i + 1));
+			}
+		}
+	return d[m][0];//最後一天股票要全賣掉
+}
+void print(int day, int s){
+	if (!day)return;
+	print(day - 1, pre[day][s]);
+	if (!opt[day][s])printf("HOLD\n");
+	else if (opt[day][s] > 0)printf("BUY "),cout<<name[opt[day][s]-1]<<endl;
+	else printf("SELL "), cout << name[-opt[day][s] - 1] << endl;
+}
+int main(){
+	int t = 0;
+	while (cin >> c >> m >> n >> kk){
+		if (t++ > 0)puts("");
+
+		for (int i = 0; i < n; i++){
+			cin >> name[i] >> s[i] >> k[i];
+			for (int j = 0; j < m; j++){
+				cin >> price[i][j];
+				price[i][j] *= s[i];
+				//s[i] 一手股的量 
+			}
+		}
+		init();
+		double ans = dp();
+		printf("%.2lf\n", ans);
+		print(m, 0);
+	}
+
+}
