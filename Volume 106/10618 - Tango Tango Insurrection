@@ -1,0 +1,114 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+
+#define M 70
+#define inf 0x3f3f3f3f
+int dir[300];
+string command;
+int d[M][4][4][3];
+int pre[M][4][4][3][3];//最後一維 L,R,S
+int n;
+int cost(int pa, int a, int ps, int s){// pa ps 上一個狀態 s狀態a方向
+	if (ps != s)return 1;//如果上次不是動同隻腳 代表這隻腳上次沒有動 消耗1
+	if (pa == a)return 3;
+	if (pa + a == 3)return 7;
+	return 5;
+}
+bool ok(int a,int b,int l,int r){//當前左右 移動後左右
+	if (a == l&&b == r)return 1;//沒移動
+	if (a == l)//如果左腳不動
+		return r != a&&a != 2; //左腳不在右邊的話 右只要不放在左腳就好 左腳在右邊 只能動左腳
+	else
+		return l != b&&b != 1;//同上
+	return 0;
+}
+int dp(int i, int a, int b, int s){
+	if (i == n)return 0;
+	if (d[i][a][b][s] != inf)return d[i][a][b][s];
+	int tmp;
+	if (command[i] != '.'){
+		if (ok(a, b, dir[command[i]], b)){//動左腳
+			tmp=dp(i + 1, dir[command[i]], b, 1) + cost(a, dir[command[i]], s, 1);
+			if (tmp < d[i][a][b][s]){
+				d[i][a][b][s] = tmp;
+				pre[i][a][b][s][0] = dir[command[i]];
+				pre[i][a][b][s][1] = b;
+				pre[i][a][b][s][2] = 1;
+			}
+		}
+		if (ok(a, b, a, dir[command[i]])){//動右腳
+			tmp = dp(i + 1, a, dir[command[i]], 2) + cost(b, dir[command[i]], s, 2);
+			if (tmp < d[i][a][b][s]){
+				d[i][a][b][s] = tmp;
+				pre[i][a][b][s][0] = a;
+				pre[i][a][b][s][1] = dir[command[i]];
+				pre[i][a][b][s][2] = 2;
+			}
+		}
+	}
+	else{//. 不踩 1.動左腳2.右腳3.不動
+		d[i][a][b][s] = dp(i + 1, a, b, 0);
+		pre[i][a][b][s][0] = a;
+		pre[i][a][b][s][1] = b;
+		pre[i][a][b][s][2] = 0;
+		for (int j = 0; j < 4; j++){//
+			if (ok(a, b, j, b)){//左
+				tmp = dp(i + 1, j, b, 1) + cost(a, j, s, 1);
+				if (tmp < d[i][a][b][s]){
+					d[i][a][b][s] = tmp;
+					pre[i][a][b][s][0] = j;
+					pre[i][a][b][s][1] = b;
+					pre[i][a][b][s][2] = 1;
+				}
+			}
+			if (ok(a, b, a, j)){//右
+				tmp = dp(i + 1, a, j, 2) + cost(b, j, s, 2);
+				if (tmp < d[i][a][b][s]){
+					d[i][a][b][s] = tmp;
+					pre[i][a][b][s][0] = a;
+					pre[i][a][b][s][1] = j;
+					pre[i][a][b][s][2] = 2;
+				}
+			}
+			
+		}
+	
+	}
+	return d[i][a][b][s];
+}
+void print(int i, int a, int b, int s){
+	if (i == n)return;
+	int k = pre[i][a][b][s][2];
+	switch (k){
+	case 0: putchar('.'); break;
+	case 1: putchar('L'); break;
+	case 2: putchar('R'); break;
+	}
+	print(i + 1, pre[i][a][b][s][0], pre[i][a][b][s][1], pre[i][a][b][s][2]);
+}
+int main(){
+	dir['U'] = 0; dir['L'] = 1; dir['R'] = 2; dir['D'] = 3;
+	while (cin>>command, command != "#"){
+		memset(d, inf, sizeof(d));
+		memset(pre, 0, sizeof pre);
+		n = command.size();
+		dp(0, 1, 2, 0);
+		print(0, 1, 2, 0);
+		puts("");
+	}
+}
