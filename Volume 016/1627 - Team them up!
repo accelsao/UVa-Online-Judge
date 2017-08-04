@@ -99,7 +99,7 @@ int main(){
 		for (int i = 1; i <= n; i++)
 			while (cin >> m, m)
 				g[i][m] = 1;
-		if (n == 1 || !build())
+		if (!build())
 			puts("No solution");
 		else dp();
 		if (t)puts("");
