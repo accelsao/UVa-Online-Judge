@@ -1,0 +1,39 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+long long d[64][64] = {};//i顆球 實驗j次 的最高level
+
+int main(){
+	//如果破 k=d(i-1,j-1)+1
+	//如果沒破 d(i,j)=k+d(i,j-1)  
+	//d(i,j)=d(i-1,j-1)+1+d(i,j-1);
+	for (int i = 1; i < 64; i++)
+		for (int j = 1; j < 64; j++)
+			d[i][j] = d[i - 1][j - 1] + 1 + d[i][j - 1];
+	int k;
+	long long n;
+	while (cin >> k >> n,k){
+		k = min(k, 63);//測是超過63終止 給超過63顆球 最多用到63顆每測都爆
+		bool over = 1;
+		for (int i = 0; i <= 63; i++)
+			if (d[k][i] >= n){
+				printf("%d\n", i);
+				over = 0;
+				break;
+			}
+		if (over)puts("More than 63 trials needed.");
+	}
+}
