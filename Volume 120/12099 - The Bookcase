@@ -70,3 +70,82 @@ int main(){
 		printf("%d\n", ans);
 	}
 }
+----------------------------------------------------------------------------------------------以下 二維
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+
+
+#define W 30
+#define scanf scanf_s
+#define N 71
+struct book{
+	int h, w;
+	bool operator<(const book &a)const{
+		return h > a.h || (h == a.h&&w > a.w);
+	}
+}p[N];
+int n,dp[N*W][N*W];
+int sw[N];
+inline int f(int w, int h){
+	return w ? 0 : h;
+}
+inline void update(int &nd, int d){
+	if (nd < 0 || d < nd)nd = d;
+}
+int main(){
+	int t;
+	scanf("%d", &t);
+	while (t--){
+		scanf("%d", &n);
+		for (int i = 0; i < n; i++)
+			scanf("%d%d", &p[i].h, &p[i].w);
+		sort(p, p + n);
+		sw[0] = p[0].w;
+		for (int i = 1; i < n; i++)
+			sw[i] = sw[i - 1] + p[i].w;
+		for (int i = 0; i <= sw[n - 1]; i++)
+			for (int j = 0; j <= sw[n - 1]-i; j++)
+				dp[i][j] = -1;
+		dp[0][0] = p[0].h;
+		for (int i = 1; i < n; i++)
+			for (int j = sw[n - 1]; j >= 0; j--){
+				if (!j){
+					update(dp[p[i].w][0], dp[0][0] + p[i].h);
+					continue;
+				}
+				//總重-第一層-j = k 
+				int lim = sw[i - 1] - p[0].w - j;
+					for (int k = lim; k >=0;k--)
+						if (dp[j][k] >= 0){
+							update(dp[j + p[i].w][k], dp[j][k] + f(j, p[i].h));
+							update(dp[j][k + p[i].w], dp[j][k] + f(k, p[i].h));
+						}
+				
+			}
+		
+		int ans = -1;
+		for (int j = 1; j <= sw[n-1]; j++)
+			for (int k = 1; k <= sw[n-1]-j;k++)
+				if (dp[j][k] >= 0){
+					int w = max(max(j, k), sw[n-1] - j - k);
+					update(ans, dp[j][k]*w);
+				}
+		printf("%d\n", ans);
+	}
+}
+
