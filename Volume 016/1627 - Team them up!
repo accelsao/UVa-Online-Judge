@@ -1,0 +1,107 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+#define M 101
+int d[M][M * 2],dif[M];
+int g[M][M];
+int group[M];
+vector<int>team[M][2];
+int n, m, num;
+bool dfs(int u, int c){//是否二分
+	group[u] = c;//c 1or2
+	team[num][c-1].push_back(u);
+	for (int v = 1; v <= n;v++)
+		if (v != u&&!(g[u][v] && g[v][u])){//不同組且不互相認識
+			if (group[v] && group[u] == group[v])return 0;//不認識卻同組
+			if (!group[v]&&!dfs(v, 3 - c))return 0;//(不認識必在另外一組)還沒配對且二分不了
+		}
+	return 1;
+}
+bool build(){//建連通塊
+	num = 0;
+	//memset(dif, 0, sizeof(dif));
+	for (int i = 0; i < M; i++)group[i] = 0;
+	for (int i = 1; i <= n;i++)
+		if (!group[i]){
+			team[num][0].clear();
+			team[num][1].clear();
+			if (!dfs(i, 1))return 0;
+			dif[num] = team[num][0].size() - team[num][1].size();
+			num++;
+		}
+	return 1;
+}
+void print(int ans){
+	int t = 0;
+	vector<int>t1, t2;
+	for (int i = num - 1; i >= 0; i--){
+		if (d[i][n + ans - dif[i]]){//組號為t
+			t = 0; ans -= dif[i];
+		}
+		else {
+			t = 1; ans += dif[i];
+		}
+		for (int j = 0; j < team[i][t].size(); j++)
+			t1.push_back(team[i][t][j]);
+		t ^= 1;
+		for (int j = 0; j < team[i][t].size(); j++)
+			t2.push_back(team[i][t][j]);
+	}
+	printf("%d", t1.size());
+	for (int i = 0; i < t1.size(); i++)
+		printf(" %d", t1[i]);
+	puts("");
+	printf("%d", t2.size());
+	for (int i = 0; i < t2.size(); i++)
+		printf(" %d", t2[i]);
+	puts("");
+}
+void dp(){
+//d[i][j+n] 考慮到i個連通塊時 相差j的情況是否存在
+	memset(d, 0, sizeof(d));
+	d[0][0+n] = 1;
+	//±n範圍
+	for (int i = 0; i < num; i++)
+		for (int j = -n; j <= n; j++)
+			if (d[i][j + n]){
+				d[i + 1][j + n + dif[i]] = 1;
+				d[i + 1][j + n - dif[i]] = 1;
+			}
+	for (int i = 0; i <= n; i++){
+		if (d[num][n + i]){
+			print(i); return;
+		}
+		if (d[num][n - i]){
+			print(-i); return;
+		}
+	}
+}
+
+int main(){
+	int t;
+	cin >> t;
+	while (t--){
+		memset(g, 0,sizeof(g));
+		cin >> n;
+		for (int i = 1; i <= n; i++)
+			while (cin >> m, m)
+				g[i][m] = 1;
+		if (n == 1 || !build())
+			puts("No solution");
+		else dp();
+		if (t)puts("");
+	}
+}
