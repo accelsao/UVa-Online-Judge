@@ -1,0 +1,100 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+#define M 16
+struct item{
+	string s, r;
+	bool operator<(const item&a)const{
+		return s.size() < a.s.size();
+	}
+}t[M];
+string s[M][2];
+int slen[M],n;
+int overlap[M][M][2][2];
+int cover(const string& a, const string& b){
+	int n1 = a.size(); int n2 = b.size();
+	for (int i = 1; i < n1; i++){//b[0]從a[i]開始 逐一比對
+		if (n2 + i < n1)continue;//太短比不到a[n1-1]
+		bool ok = 1;
+		for (int j = 0; j + i < n1;j++)
+			if (a[i + j] != b[j]){
+				ok = 0; break;
+			}
+		if (ok)return n1 - i;
+	}
+	return 0;
+}
+
+void init(){
+	for (int i = 0; i < n; i++){
+		cin >> t[i].s;
+		t[i].r = t[i].s;
+		reverse(t[i].r.begin(), t[i].r.end());
+	}
+	int m = 0;
+	sort(t, t + n);
+	for (int i = 0; i < n; i++){//把包含在某個字串中的字串刪除
+		bool need = 1;
+		for (int j = i + 1; j < n; j++)
+			if (t[j].s.find(t[i].s) != -1 || t[j].r.find(t[i].s) != -1){
+				need = 0; break;//不需要
+			}
+		if (need){
+			s[m][0] = t[i].s; s[m][1] = t[i].r;
+			slen[m] = t[i].s.size(); m++;
+		}
+	}
+	n = m;//處理後的字串數量
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			for (int x = 0; x < 2; x++)
+				for (int y = 0; y < 2; y++)
+					overlap[i][j][x][y] = cover(s[i][x], s[j][y]);//算覆蓋長度
+}
+int d[1 << M][M][2];//[已選過的字串集合][末字串][正反]可以減去的重疊總長
+inline void update(int &x, int v){
+	if (x<0 || v<x)x = v;
+}
+void dp(){
+	memset(d, -1, sizeof(d));
+	d[1][0][0] = slen[0];//s[0][0] 集合{1}
+	int full = (1 << n) - 1;
+	for (int s = 1; s < full; s++){
+		for (int i = 0; i < n; i++)
+			for (int x = 0; x < 2; x++)
+				if (d[s][i][x] >= 0)
+					for (int j = 1; j < n; j++)
+						if (!(s&(1 << j)))//j條沒被選到
+							for (int y = 0; y < 2; y++)//d(s+{j},j,y)=d(s,i,x)+len[j]-cover(i,j) 多的部分  
+								update(d[s | (1 << j)][j][y], d[s][i][x]+slen[j]-overlap[i][j][x][y]);
+	}
+	int ans = -1;
+	for (int i = 0; i < n; i++)
+		for (int x = 0; x < 2; x++){
+			if (d[full][i][x] < 0)continue;
+			//還要扣掉環 第一條在下的重複長度[i][0][x][0]
+			update(ans, d[full][i][x] - overlap[i][0][x][0]);
+		}
+	if (ans <= 1)ans = 2;
+	printf("%d\n", ans);
+}
+int main(){
+	while (cin >> n, n){
+		init();
+		dp();
+	}
+}
