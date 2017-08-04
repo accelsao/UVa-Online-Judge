@@ -1,0 +1,72 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+
+
+#define W 30
+#define N 71
+struct book{
+	int h, w;
+	bool operator<(const book &a)const{
+		return h > a.h || (h == a.h&&w > a.w);
+	}
+}p[N];
+int n,dp[2][N*W][N*W];
+int sw[N];
+inline int f(int w, int h){
+	return w ? 0 : h;
+}
+inline void update(int &nd, int d){
+	if (nd < 0 || d < nd)nd = d;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--){
+		cin >> n;
+		for (int i = 0; i < n; i++)
+			cin >> p[i].h >> p[i].w;
+		sort(p, p + n);
+		sw[0] = 0;
+		for (int i = 1; i <= n; i++)
+			sw[i] = sw[i - 1] + p[i-1].w;
+		dp[0][0][0] = 0;
+		int t = 0;
+		for (int i = 0; i < n; i++){
+			for (int j = 0; j <= sw[i + 1]; j++)
+				for (int k = 0; k + j <= sw[i + 1]; k++)
+					dp[t ^ 1][j][k] = -1;
+			for (int j = 0; j <= sw[i]; j++)
+				for (int k = 0; k <= sw[i] - j;k++)
+					if (dp[t][j][k] >= 0){
+						update(dp[t ^ 1][j][k] , dp[t][j][k]);
+						update(dp[t ^ 1][j+p[i].w][k], dp[t][j][k] + f(j, p[i].h));
+						update(dp[t ^ 1][j][k + p[i].w], dp[t][j][k] + f(k, p[i].h));
+					}
+			t ^= 1;
+		}
+		int ans = 1e9;
+		for (int j = 1; j <= sw[n]; j++)
+			for (int k = 1; k <= sw[n]-j;k++)
+				if (dp[t][j][k] >= 0){
+					int w = max(max(j, k), sw[n] - j - k);
+					int h = dp[t][j][k] + p[0].h;
+					ans = min(ans, h*w);
+				}
+		printf("%d\n", ans);
+	}
+}
