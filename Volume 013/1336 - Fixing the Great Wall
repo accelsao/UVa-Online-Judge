@@ -1,0 +1,73 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+
+#define M 1001
+#define scanf scanf_s
+struct repair{
+	double x, c, d;
+	bool operator<(const repair a)const{
+		return x < a.x;
+	}
+}p[M];
+int n,kk;
+double v,x;
+double d[M][M][2];//0左點 1右點
+int vis[M][M][2];
+double sum[M];
+double cost(double x1, double x2, int i, int j){
+	double f = 0;
+	if (i<=j&&i>0)f += sum[j] - sum[i - 1];
+	return (sum[n] - f)*fabs(x2 - x1) / v;
+}
+double dp(int i,int j,int k){
+	if (i == 1 && j == n)return 0;
+	double &ans = d[i][j][k];
+	if (vis[i][j][k] == kk)return ans;
+	vis[i][j][k] = kk;
+	ans = 1e9;
+	double x = k ? p[j].x : p[i].x;
+	if (i > 1)ans = min(ans, dp(i - 1, j, 0) + cost(x, p[i - 1].x, i, j));
+	if (j < n) ans = min(ans, dp(i, j + 1, 1) + cost(x, p[j + 1].x, i, j));
+	return ans;
+}
+int main(){
+	memset(vis, 0, sizeof(vis));
+	while (scanf("%d%lf%lf",&n,&v,&x)==3&&n){
+		++kk;
+		double s = 0;
+		for (int i = 1; i <= n; i++){
+			scanf("%lf%lf%lf", &p[i].x, &p[i].c, &p[i].d);
+			s += p[i].c;
+		}
+		sort(p + 1, p + n + 1);
+		sum[0] = 0;
+		for (int i = 1; i <= n; i++)
+			sum[i] = sum[i - 1] + p[i].d;
+		p[0].x = -1e9; p[n + 1].x= 1e9;
+		double ans = 1e9;
+		for (int i = 1; i <= n + 1; i++)
+			if (x > p[i - 1].x&&x < p[i].x){
+				if (i>1)
+					ans = min(ans, dp(i - 1, i - 1, 0) + cost(x, p[i - 1].x, -1, -1));
+				if (i <= n)
+					ans = min(ans, dp(i, i, 0) + cost(x, p[i].x, -1, -1)); // move right
+				break;
+			}
+		printf("%.0lf\n", floor(ans + s));
+	}
+}
