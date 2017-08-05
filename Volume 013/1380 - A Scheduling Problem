@@ -1,0 +1,149 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+
+#define N 201
+#define INF 1e9
+int n, root, maxlen;
+struct edge{
+	int u, v, d;//d 0:u-v 1:u->v 2:u<-v
+	//edge(int u = 0, int v = 0, int d = 0) :u(u), v(v), d(d){}
+};
+vector<edge>edges[N];
+int f[N], g[N], father[N];
+bool read(){
+	bool data = 0;
+	int a,b;
+	n = 0;
+	for (int i = 0; i < N; i++){
+		edges[i].clear();
+		father[i] = 0;
+	}
+	while (cin >> a, a){
+		string s; data = 1;
+		if (a>n)n = a;
+		while (cin >> s, s != "0"){
+			int len = s.size();
+			char d = s[len - 1];
+			if (d == 'u' || d == 'v')
+				s.substr(0, len - 1);
+			stringstream ss(s);
+			ss >> b;
+			if (b > n)n = b;
+			father[b] = 1;//有父結點
+			if (d == 'd'){
+				edges[a].push_back(edge{ a, b, 1 });
+				edges[b].push_back(edge{ b, a, 2 });
+			}
+			else if (d == 'u'){
+				edges[a].push_back(edge{ a, b, 2 });
+				edges[b].push_back(edge{ b, a, 1 });
+			}
+			else
+				edges[a].push_back(edge{ a, b, 0 });
+		
+		}
+	}
+	if (data)
+		for (int i = 1; i <= n;i++)
+			if (!father[i] && !edges[i].empty()){
+				root = i; break;
+			}
+	return data;
+}
+int dfs(int u){
+	int ans = 0;
+	for (int i = 0; i < edges[u].size(); i++){
+		int v = edges[u][i].v;
+		if (edges[u][i].d == 1)//u->v
+			ans = max(ans, dfs(v) + 1);
+	}
+	return ans;
+}
+struct undirectedson{
+	int w, f, g;
+};
+bool cf(const undirectedson &a, const undirectedson &b){
+	return a.f < b.f;
+}
+bool cg(const undirectedson &a, const undirectedson &b){
+	return 	a.g < b.g;
+}
+//f0=max{f[w] | w->i}+1
+//g0=max{g[w] | i->w}+1
+//change u-v to w->iori->w 
+//if(f0+g0<=maxlen)f=f0,g=g0 otherwise both are INF
+bool dp(int i, int fa){
+	if (edges[i].empty()){
+		f[i] = g[i] = 0;
+		return 1;
+	}
+	vector<undirectedson>s;
+	int f0 = 0, g0 = 0;
+	for (int k = 0; k < edges[i].size(); k++){
+		int w = edges[i][k].v;
+		if (w == fa)continue;
+		dp(w, i);
+		int d = edges[i][k].d;
+		if (!d)s.push_back(undirectedson{ w, f[w], g[w] });
+		else if (d == 1)g0 = max(g0, g[w] + 1);//g u->v i->w
+		else f0 = max(f0, f[w] + 1);
+	}
+	if (s.empty()){
+		f[i] = f0, g[i] = g0;
+		if (f[i] + g[i] > maxlen)f[i] = g[i] = INF;
+		return f[i] < INF;
+	}
+	f[i] = g[i] = INF;
+	int sn = s.size();
+	//f[i]
+	sort(s.begin(), s.end(), cf);
+	int mg[N];//max s[i].g i 0~s-1
+	mg[sn - 1] = s[sn-1].g;
+	for (int k = sn - 2; k >= 0; k--)
+		mg[k] = max(mg[k + 1], s[k].g);
+	for (int p = 0; p <= sn; p++){
+		int f1=f0, g1=g0;
+		if (p)f1 = max(f1, s[p - 1].f + 1);
+		if (p < sn)g1 = max(g1, mg[p] + 1);
+		if (f1 + g1 <= maxlen)f[i] = min(f[i], f1);
+	}
+	//g[i]
+	sort(s.begin(), s.end(), cg);
+	int mf[N];//max s[i].g i 0~s-1
+	mf[sn - 1] = s[sn - 1].f;
+	for (int k = sn - 2; k >= 0; k--)
+		mf[k] = max(mf[k + 1], s[k].f);
+	for (int p = 0; p <= sn; p++){
+		int f1 = f0, g1 = g0;
+		if (p)g1 = max(g1, s[p - 1].g + 1);
+		if (p < sn)f1 = max(f1, mf[p] + 1);//f'[i]=f[w]+1
+		if (f1 + g1 <= maxlen)g[i] = min(g[i], g1);
+	}
+	return f[i] < INF;
+}
+int main(){
+	while (read()){
+		maxlen = 0;
+		for (int i = 1; i <= n; i++)
+			maxlen = max(maxlen, dfs(i));
+		if (dp(root, -1))
+			printf("%d\n", maxlen+1);
+		else
+			printf("%d\n", maxlen + 2);
+	}
+}
