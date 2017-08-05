@@ -44,22 +44,22 @@ int main(){
 		}
 		for (int i = 0; i < n; i++)
 			for (int j = -(n - 1); j <= n - 1; j++)
-				v.push_back(p[i] + j*d);
+				v.push_back(p[i] + j*d);//所有費用可能
 		sort(v.begin(), v.end());
-		it= unique(v.begin(), v.end());
+		it= unique(v.begin(), v.end());//刪除重複 由小排序
 		v.resize(distance(v.begin(), it));
 		int m = v.size();
 		for (int i = 0; i < m; i++){
 			dp[0][i] = INF;
-			if (v[i] == p[0])dp[0][i] = 0;
-		}		
+			if (v[i] == p[0])dp[0][i] = 0;//p[0]不能修改所以給0
+			
 		//d[i][j] 已修改了i個數 第i個數改為p[j] 的最小費用
 		int t = 0;
 		for (int i = 1; i < n; i++){
 			int k = 0;
 			for (int j = 0; j < m; j++){
 				while (k < m&&v[k] < v[j] - d)k++;//兩者值小於d
-				while (k + 1 < m&&v[k + 1] <= v[j] + d&&dp[t][k + 1] <= dp[t][k])
+				while (k + 1 < m&&v[k + 1] <= v[j] + d&&dp[t][k + 1] <= dp[t][k])//找最小值 
 					k++;
 				if (dp[t][k] == INF)dp[t ^ 1][j] = INF;
 				else dp[t^1][j] = dp[t][k] + abs(v[j] - p[i]);	
