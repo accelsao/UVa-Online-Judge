@@ -1,0 +1,84 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+
+#define N 15
+#define M 101
+int m,n;
+int u[M], v[M];
+int G[N][N];
+int ind[1 << N], d[1 << N], best[1 << N], label[N];
+bool indep(int mask){//找內部沒有邊的"集合"
+	for (int i = 0; i < N; i++)
+		if (mask&(1 << i))
+			for (int j = 0; j < N; j++)
+				if (mask&(1 << j) && i != j&&G[i][j])return 0;
+	return 1;
+}
+// How many colors are needed to color the set 'mask'
+int dp(int mask){//圖的色數 以min的色數 使相鄰點不同色
+	int &ans = d[mask];
+	if (ans != -1)return ans;
+	if (!mask)return 0;
+	ans = N + 1;
+	for (int s = mask; s;s= (s - 1)&mask)
+		if (ind[s]){//s是內部都獨立的邊 換句話說 可以染色同顏色
+			int v = dp(mask^s) + 1;
+			if (v < ans){
+				ans = v;
+				best[mask] = s;
+			}
+		}
+	return ans;
+}
+void mark(int mask, int c){
+	for (int i = 0; i < N; i++)
+		if (mask&(1 << i))label[i] = c;
+}
+int main(){
+	while (cin >> m){
+		memset(G, 0, sizeof(G));
+		int useful = 0;
+		for (int i = 0; i < m; i++){
+			char a, b;
+			cin >> a >> b;
+			u[i] = a - 'L'; v[i] = b - 'L';
+			G[u[i]][v[i]] = 1;
+			useful |= 1 << u[i];
+			useful |= 1 << v[i];
+		}
+		//find 獨立的集合
+		memset(ind, 0, sizeof(ind));
+		for (int s = useful; s; s=(s - 1)&useful)//相當於拿掉最右邊的1
+			if (indep(s))
+				ind[s] = 1;
+
+		memset(d, -1, sizeof(d));
+
+		int ans = dp(useful);
+		printf("%d\n", ans - 2);//題目所求為 waiting chain 故-2
+		int s = useful, k = 0;
+		while (s){
+			mark(s, k++);
+			s ^= best[s];
+		}
+		for (int i = 0; i < m; i++){
+			if (label[u[i]] < label[v[i]]) swap(u[i], v[i]);
+			printf("%c %c\n", 'L' + u[i], 'L' + v[i]);
+		}
+	}
+}
