@@ -1,0 +1,75 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+
+#define N 65
+#define LL unsigned long long
+LL k, dp[N][N], mnv, mxv;
+int n, d, K[N];
+vector<int>one, zero;
+int on, zn;
+bool getzero(int i, int j){
+	return i< zn && (j == on || one[j] + d >= zero[i]);
+}
+bool getone(int i, int j){
+	return j < on && (i == zn || zero[i] + d >= one[j]);
+}
+void greedy(){
+	mnv = mxv = 0;
+	int i = 0, j = 0;//i zero j one
+	while (i < zn || j < on){//min
+		if (getzero(i, j))
+			i++, mnv *= 2;
+		else
+			j++, mnv *= 2, mnv++;
+	}
+	i = 0, j = 0;//i zero j one
+	while (i < zn || j < on){//max
+		if (!getone(i, j))
+			i++, mxv *= 2;
+		else
+			j++, mxv *= 2, mxv++;
+	}
+}
+void solve(){
+	on = zn = 0;
+	for (int i = 0; i < n; i++)
+		if (K[i])one.push_back(i);
+		else zero.push_back(i);
+		on = one.size(), zn = zero.size();
+		greedy();//找極值
+		memset(dp, 0, sizeof(dp));
+		dp[0][0] = 1;
+		for (int i = 0; i <= zn; i++)
+			for (int j = 0; j <= on; j++){
+				if (getzero(i, j))
+					dp[i + 1][j] += dp[i][j];
+				if (getone(i, j))
+					dp[i][j+1] += dp[i][j];
+			}
+		cout << dp[zn][on] << " " << mnv << " " << mxv << "\n";
+}
+int main(){
+	int t = 1;
+	while (cin >> n >> d >> k){
+		one.clear(), zero.clear();
+		for (int i = 0; i < n; i++, k /= 2)
+			K[(n - 1) - i] = k % 2;
+		printf("Case %d: ", t++);
+		solve();
+	}
+}
