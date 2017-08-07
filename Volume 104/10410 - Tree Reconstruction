@@ -1,0 +1,52 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+#include<deque>
+using namespace std;
+
+
+int n, pos[1001];
+vector<int>v[1001];
+int main(){
+	while (cin >> n){
+		int x;
+		for (int i = 1; i <= n; i++){
+			cin >> x;
+			v[i].clear();
+			pos[x] = i;
+		}
+		int root;
+		stack<int>s;
+		cin >> root; s.push(root);
+		for (int i = 1; i < n; i++){
+			cin >> x;
+			while (1){
+				int u = s.top();
+				if (u == root || pos[x] - pos[u] > 1){//相鄰不會是子點
+					v[u].push_back(x);
+					s.push(x);
+					break;
+				}
+				else s.pop();
+			}
+		}
+		for (int i = 1; i <= n; i++){
+			printf("%d:", i);
+			for (int j = 0; j < v[i].size(); j++)
+				printf(" %d", v[i][j]);
+			puts("");
+		}
+	}
+}
