@@ -1,0 +1,70 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+int NP[101],NT;
+int n,k,p;
+vector<map<int,int>> T;
+map<int, int>m;
+map<int, int>::iterator it;
+int main(){
+	int t = 1;
+	while (cin >> p,p){
+		T.clear();
+		for (int i = 1; i <= p; i++)
+			cin >> NP[i];
+		cin >> n;
+		for (int i = 1; i <= n; i++){
+			m.clear();
+			while (cin >> k, k){
+				if (!m.count(k))
+					m[k]=1;
+				else m[k]++;
+			}
+			T.push_back(m);
+		}
+		int k=0;
+		cin >> n;
+		for (k = 0; k < n; k++){	
+			bool ok;
+			for (int j = 0; j < T.size(); j++){
+				ok = 1;
+				it = T[j].begin();
+				for (; it != T[j].end(); it++){
+					if (it->first > 0)break;
+					if (NP[-(it->first)]<it->second){ ok = 0; break; }
+				}
+				if (ok){
+					for (it = T[j].begin(); it != T[j].end(); it++)
+						if (it->first<0)NP[-it->first]-=it->second;//輸出
+						else NP[it->first] += it->second;
+					break;
+				}
+			}
+			if (!ok){
+				printf("Case %d: dead after %d transitions\n", t++, k);
+				break;
+			}
+		}
+		if (k == n)
+			printf("Case %d: still live after %d transitions\n", t++, n);
+		printf("Places with tokens:");
+		for (int i = 1; i <= p;i++)
+			if (NP[i])
+				printf(" %d (%d)", i, NP[i]);
+		puts("\n");
+	}
+}
