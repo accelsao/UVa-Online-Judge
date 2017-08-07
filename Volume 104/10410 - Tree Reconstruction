@@ -34,7 +34,7 @@ int main(){
 			cin >> x;
 			while (1){
 				int u = s.top();
-				if (u == root || pos[x] - pos[u] > 1){//相鄰不會是子點
+				if (u == root || pos[x] - pos[u] > 1){//bfs子節點位置比父節點至少大1 (根除外) 若相差1則為兄弟節點
 					v[u].push_back(x);
 					s.push(x);
 					break;
