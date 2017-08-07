@@ -1,0 +1,102 @@
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+#include<cassert>
+using namespace std;
+
+#define N 70
+char g[N][N];
+vector<int>a;
+int k[10] = { 1 },n,d;
+int solve_g(int l, int r, int u, int d, int cur, int p){
+	bool w = 1, b = 1;//white black
+	for (int i = u; i <= d; i++){
+		if (!w&&!b)break;//有黑有白break
+		for (int j = l; j <= r; j++){
+			if (g[i][j] == '1')w = 0;
+			else b = 0;
+		}
+	}
+	//b==1 全黑 w==1全白回傳-1
+	if (w || b) return b ? cur : -1;
+	int h = l + (r - l + 1) / 2;
+	int v = u + (d - u + 1) / 2;
+	//12
+	//34
+	int t = solve_g(l, h - 1, u, v - 1, cur + k[p], p + 1);
+	if (t != -1)a.push_back(t);
+	t = solve_g(h, r, u, v - 1, cur + k[p] * 2, p + 1);
+	if (t != -1)a.push_back(t);
+	t = solve_g(l, h - 1, v, d, cur + k[p] * 3, p + 1);
+	if (t != -1)a.push_back(t);
+	t = solve_g(h, r, v, d, cur + k[p] * 4, p + 1);
+	if (t != -1)a.push_back(t);
+	return -1;
+}
+void solve_a(int b){
+	int l = 0, r = n - 1, u = 0, d = n - 1;
+	while (b){
+		int h = l + (r - l + 1) / 2, v = u + (d - u + 1) / 2;
+		switch (b % 5){
+		case 1:r = h - 1, d = v - 1; break;
+		case 2:l = h, d = v - 1; break;
+		case 3:r = h - 1, u = v; break;
+		case 4:l = h, u = v; break;
+		}
+		b /= 5;
+	}
+	for (int i = u; i <= d; ++i)
+		for (int j = l; j <= r; ++j)
+			g[i][j] = '*';
+	return;
+}
+int main(){
+	for (int i = 1; i < 10; i++)
+		k[i] = k[i - 1] * 5;
+	int t = 0;
+	while (cin >> n, n){
+		if (t)puts("");
+		printf("Image %d\n", ++t);
+		a.clear();
+		memset(g, 0, sizeof(g));
+		if (n > 0){
+			for (int i = 0; i < n; i++)
+				for (int j = 0; j < n; j++)
+					cin >> g[i][j];
+			d=solve_g(0,n-1,0,n-1,0,0);
+			if (d != -1)a.push_back(d);
+			sort(a.begin(), a.end());
+			for (int i = 0; i < a.size();){
+				printf("%d", a[i++]);
+				if (i % 12 == 0 || i == a.size())puts("");//一行限12個字
+				else putchar(' ');
+			}
+			printf("Total number of black nodes = %d\n", a.size());
+		}
+		else{
+			n = -n;
+			while (1){
+				cin >> d;
+				if (d < 0)break;
+				solve_a(d);
+			}
+			for (int i = 0; i < n; i++){
+				for (int j = 0; j < n; j++)
+					if (!g[i][j])putchar('.');
+					else putchar(g[i][j]);
+					puts("");
+			}
+		}
+	}
+}
