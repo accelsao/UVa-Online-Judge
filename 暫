@@ -42,26 +42,14 @@ int joint(int x, int y){
 	return 1;
 }
 int main(){
-	/*FILE *stream;
-	freopen_s(&stream, "12118.txt", "r", stdin);
-	freopen_s(&stream, "12118.txt", "w", stdout);*/
 	int T = 1;
 	int v, e, t;
-	//int ll = 10;//10組
-	while (cin >> v >> e >> t,v){
-		/*srand(time(NULL));
-		v = rand() % 1000 + 1;
-		e = rand() % (v*(v - 1) / 2 + 1);
-		t = rand() % 10 + 1;
-		printf("%d %d %d\n", v, e, t);*/
+	while (cin >> v >> e >> t, v){
 		for (int i = 1; i <= v; i++)
 			group[i] = i, w[i] = d[i] = 0, p[i].clear();
 		int n = v, x, y, len;//n 可以看成群 有
 		for (int i = 0; i < e; i++){
 			cin >> x >> y;
-			/*x = rand() % v + 1;
-			y = rand() % v + 1;
-			printf("%d %d\n", x, y);*/
 			d[x]++, d[y]++;
 			if (joint(x, y))n--;
 		}
@@ -75,31 +63,16 @@ int main(){
 		for (int i = 1; i <= v; i++)
 			if (!(!w[i] && find(i) == i))
 				p[group[i]].push_back(i);
-
 		for (int i = 1; i <= v; i++)
 			if (d[i] & 1)
 				odd[find(i)]++;
-
 		for (int i = 1; i <= v; i++)
 			if (odd[i] >= 4)//除了起點終點外 >=2 就需要補邊
 				ans += (odd[i] - 2) / 2 * 100;//奇數度n點 除了起終  (n-2)  尚須(n-2)/2條邊走完剩下的點
 		printf("Case %d: %d\n", T++, ans);
-
 		int ss = 0;
 		for (int i = 1; i <= v; i++)
 			ss = max(ss, (int)p[i].size());
-
-		printf("%d\n",ss);
-		/*int r = 1;
-		for (int i = 1; i <= v; i++)
-			if (p[i].size()){
-				printf("City %d:", r++);
-				for (int j = 0; j < p[i].size(); j++)
-					printf(" %d", p[i][j]);
-				puts("");
-			}*/
-
+		printf("%d\n", ss);
 	}
-	/*fclose(stdin);
-	fclose(stdout);*/
 }
