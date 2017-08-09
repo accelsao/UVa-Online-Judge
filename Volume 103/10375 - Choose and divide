@@ -1,0 +1,47 @@
+#include<iostream>
+#include<cmath>
+#include<cstring>
+using namespace std;
+
+#define N  10001
+int prime[N];
+int num[N],t;
+int e[N];
+void add(int n,int d){
+	for (int i = 0; i < t; i++){
+		while (n%prime[i]==0){
+			n /= prime[i];
+			e[i] += d;
+		}
+		if (n == 1)break;
+	}
+}
+void factorial(int n, int d){
+	for (int i = 1; i <= n; i++)
+		add(i, d);
+}
+int main(){
+	for (int i = 0; i < N; i++)num[i] = 0;
+	t = 0;
+	for (int i = 2; i <= (N-1); i++){
+		if (!num[i])
+			prime[t++] = i;
+		for (int j = 2*i; j < N; j += i)
+			num[j] = 1;
+	}
+	int p, q, r, s;
+	while (cin >> p >> q >> r >> s){
+		memset(e, 0, sizeof(e));
+		factorial(p, 1);
+		factorial(q, -1);
+		factorial(p-q, -1);
+		factorial(r, -1);
+		factorial(s, 1);
+		factorial(r-s, 1);
+		double ans = 1;
+		for (int i = 0; i < t; i++)
+			if (e[i])
+				ans *= pow(prime[i], e[i]);
+		printf("%.5lf\n", ans);
+	}	
+}
