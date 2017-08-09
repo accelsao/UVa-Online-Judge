@@ -1,0 +1,79 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+using namespace std;
+
+char p[101][101];
+int num[101][101];
+int k[10];
+int c,m,n,a;
+void dfs(int i, int j, int c,int d){
+	if (i<1 || j<1 || i>m || j>n||num[i][j]||p[i][j]-'0'!=d)return;
+	num[i][j] = c;
+	a++;
+	for (int x = -1; x <= 1; x++)
+		for (int y = -1; y <= 1; y++)
+			dfs(i + x, j + y, c, d);
+}
+int main(){
+	while (cin >> m >> n, m){
+		c = 0;
+		for (int i = 0; i < 10; i++)k[i]=0;
+		for (int i = 1; i <= m; i++)
+			for (int j = 1; j <= n; j++)
+				cin >> p[i][j];
+		memset(num, 0, sizeof(num));
+		for (int i = 1; i <= m; i++)
+			for (int j = 1; j <= n; j++)
+				if (!num[i][j] && p[i][j] - '0'){
+					a = 0;
+					dfs(i, j, ++c, p[i][j] - '0');
+					k[p[i][j] - '0'] = max(k[p[i][j] - '0'], a);
+				}
+		int s = -1;
+		for (int i = 1; i < 10; i++)
+			if (k[i])
+				s = max(s, k[i]);
+		if (s>c||!c)puts("peace");
+		else puts("choas");
+		
+	}
+}
+/*
+內容:
+列強於非洲的殖民始於1415年,列強殖民非洲的高峰期約於19世紀末至20世紀初，
+約有95%非洲領土被列強侵佔，只有衣索比亞、賴比瑞亞仍然獨立 
+直至1960年 非洲脫離列強統治，非洲殖民時代的結束 19世紀末至20世紀初是非洲殖民化的主要時期。
+非洲被完全殖民，由英、法、德、意、西、葡、比、奧斯曼帝國等列強完全瓜分。
+歐洲列強以自身實力劃割各國邊界，甚至隨意將用尺在地圖上畫一個直線也能成為邊界，分割了非洲原始族群 這樣的行為嚴重破壞了非洲國家正常發展的過程，對現今的非洲國家帶來了許多民族，邊界等等的糾紛，殖民者對非洲人的壓迫和帶來疾病造成非洲土著大量死亡
+OK
+總之
+可憐的非洲 所有國家都是矩形了 
+現在有一些國家 陷入了混亂 需要有權有能的政府來平定內政 一個國家內有各種不同的派系
+但有些派系 散落在各地 (也許是內鬨了) 只有相連的派系才能組織成政權
+理所當然的 國家會由最多派系的政權掌控 但如果政權數太多 則他們會持續內鬥 
+注意 即使是相同派系 若散落各地 也算是"不同的政權" 只有相鄰的才能組成一個
+sample input
+3 5
+51012
+50102
+51012
+1 8
+11034010
+5 5
+00001
+01101
+01551
+11101
+11991
+0 0
+sample output
+3
+biggest place: 5
+4
+biggest place: 2
+4
+biggest place: 8
+
+*/
