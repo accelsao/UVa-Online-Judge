@@ -1,0 +1,103 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<string>
+#include<vector>
+using namespace std;
+
+struct box{
+	int w, s;
+	int h;
+}p[6000];
+
+bool cmp(box a, box b){
+	return a.s > b.s;
+}
+int dp[10005] = {};
+int pos[10005] = {};
+int main(){
+	int n = 1;
+	while (cin >>p[n].w>>p[n].s>>p[n].h,p[n].w)
+		n++;
+	
+	sort(p + 1, p + n, cmp);
+	for (int i = 1; i < n; ++i)
+		dp[i] = 0;
+	dp[0] = 1e9;
+	//dp 負重
+	int Max = 0;
+	p[0].h =pos[0]= 1e9;
+	for (int i = 1; i < n; ++i)
+		for (int j = Max + 1; j >= 1; --j)
+			if (dp[j - 1]>p[i].w&&p[i].h<=pos[j-1]){
+				Max = max(Max, j);//當前要新增的位置
+				int k = min(dp[j - 1] - p[i].w, p[i].s - p[i].w);
+				if (dp[j] < k){
+					dp[j] = k;
+					//pos[Max] = p[i].h;
+					pos[j] = max(pos[j], p[i].h);
+				}
+				
+				//max(原負重,min(負重-新加的物重=新的負重,新加的物的負重))//加的物負重可能更小
+			}
+	printf("%d\n", Max);
+	char m[10050][21] = {};
+	int L = (pos[1] - 1) * 2;//pos[] max 10
+	for (int i = Max; i >= 1; i--){
+		int l = L/2 - (pos[i] - 1);
+		int r = L/2 + (pos[i] - 1);
+
+		for (int j = l; j <= r; j+=2)
+			m[Max - i][j] = '*';
+	}
+	for (int i = 0; i < Max; i++){
+		for (int j = 0; j <= L; j++)
+			putchar(m[i][j]);
+		puts("");
+	}		
+}
+/*
+有一天空與白遇到了吸血種布拉姆 因為他為了活下去 為了吸一口空的血 於是他們開啟了一場遊戲
+事關生命與尊嚴的-積木疊疊樂
+這裡的積木都不是普通的積木
+是的-積木遇到超出自身負重的重量和長度超過自身而曝露在陰影下
+會跑掉
+所以 為了看誰能將積木疊的最高
+需要考量 重量 負重 和長度
+#負重需考量自身重量
+
+*/
+/*sample
+輸入為一筆測資
+每行兩個integers a為積木重量,b為積木負重(1<=a,b<=100000)c(1<=c<=10)為積木長度 
+a=b=0時結束
+積木數量不超過10000
+
+輸出
+第一行可疊成的積木最大數目N
+接下來N行由小到大
+輸出積木長度的'*'數量
+'*'置中
+格式如範例輸出
+
+in
+300 1000  9
+1000 1200 8
+200 600 8
+100 101 6
+0 0 0
+out
+3
+   * * * * * *
+ * * * * * * * *
+* * * * * * * * *
+
+
+
+
+*/
+//N 5,500
+//長度
