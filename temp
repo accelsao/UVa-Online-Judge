@@ -1,4 +1,3 @@
-
 #define _CRT_SECURE_NO_DEPRECATE //即可關掉警告
 #include<string>
 #include<cstdio>
@@ -43,13 +42,13 @@ int joint(int x, int y){
 }
 int main(){
 	FILE *stream;
-	freopen_s(&stream, "12118.txt", "r", stdin);
-	freopen_s(&stream, "12118.txt", "w", stdout);
+	freopen_s(&stream, "12118 02.txt", "r", stdin);
+	freopen_s(&stream, "12118 02.txt", "w", stdout);
 	int T = 1;
 	int v, e, t;
 	int ll = 10;//10組
 	while (ll--){
-		srand(time(NULL));
+		srand(ll);
 		v = rand() % 1000 + 1;
 		e = rand() % (v*(v - 1) / 2 + 1);
 		t = rand() % 10 + 1;
@@ -88,59 +87,9 @@ int main(){
 		for (int i = 1; i <= v; i++)
 			ss = max(ss, (int)p[i].size());
 
-		printf("%d\n",ss);
-		/*int r = 1;
-		for (int i = 1; i <= v; i++)
-			if (p[i].size()){
-				printf("City %d:", r++);
-				for (int j = 0; j < p[i].size(); j++)
-					printf(" %d", p[i][j]);
-				puts("");
-			}*/
+		printf("%d\n", ss);
 
 	}
 	fclose(stdin);
 	fclose(stdout);
 }
-/*
-	身為家裏蹲的少年菜月昴 不知道為甚麼就被傳送到了異世界 Q_Q
-	路上碰到一位被偷了聖物的少女-艾蜜莉雅 於是就展開了
-	聖物奪回大作戰!!
-	這個世界有V個王國 每兩個王國之間是互通的 也就是說 A國可以到B國 B國也可以到A國
-	但是 有些路...不是人走的 艾蜜莉雅掌握王國間的一些情報 有些王國組成聯邦
-	他們之間有特殊通道 她知道要走哪些路才可以省時
-	找一條路(起點終點任意)使得該道路經過艾蜜莉雅所說的路 為了更加了解這個神秘的異世界
-	菜月昴還要找出所有聯邦中有哪些王國
-	畢竟他對這裡一無所知
-	為了方便計算最少所耗時間的路徑 時間採用異世界的標準單位
-
-	輸入說明
-	有多筆測資
-	第一行有3個integers
-	V(1<=V<=1000)個王國,E(0<=E<=V*(V-1)/2)條艾蜜莉雅知道的路,T(1<=T<=10)每條路所需的時間單位
-	除了艾蜜莉雅選的路以外 其他路都要耗費100時間單位
-	接下來有E行包含2個integers,a和b(1<=a,b<=V,a不等於b)代表路在a王國和b王國之間
-	當V=E=T=0時 輸入結束
-
-	輸出說明
-	每個測資 輸出最小所需時間和最大聯邦的國家數
-
-	請看範例
-
-	範例輸入
-	5 3 1
-	1 2
-	1 3
-	4 5
-	4 4 1
-	1 2
-	1 4
-	2 3
-	3 4
-	0 0 0
-	範例輸出
-	Case 1: 103
-	3
-	Case 2: 4
-	4
-	*/
