@@ -19,9 +19,22 @@ bool cmp(box a, box b){
 int dp[10005] = {};
 int pos[10005] = {};
 int main(){
+	FILE *stream;
+	//freopen_s(&stream,"c247.in.txt", "r", stdin);
+	//freopen_s(&stream,"c247.out.txt", "w", stdout);
 	int n = 1;
+	/*int seed = 0;
+	srand(seed);*/
 	while (cin >>p[n].w>>p[n].s>>p[n].h,p[n].w)
 		n++;
+	/*n = 20;
+	for (int i = 1; i < n; i++){
+		srand(i);
+		p[n].w = rand() * 10 % 100000 + 1;
+		p[n].s = rand() * 10 % 100000 + 1;
+		p[n].h = rand() % 10 + 1;
+		printf("%d %d %d\n", p[n].w, p[n].s, p[n].h);
+	}*/
 	
 	sort(p + 1, p + n, cmp);
 	for (int i = 1; i < n; ++i)
@@ -44,20 +57,29 @@ int main(){
 				//max(原負重,min(負重-新加的物重=新的負重,新加的物的負重))//加的物負重可能更小
 			}
 	printf("%d\n", Max);
-	char m[10050][21] = {};
-	int L = (pos[1] - 1) * 2;//pos[] max 10
+	//char m[10050][21] = {};
+	int L = pos[1] * 2 - 1;//pos[] max 10
 	for (int i = Max; i >= 1; i--){
-		int l = L/2 - (pos[i] - 1);
-		int r = L/2 + (pos[i] - 1);
+		/*int l = L/2 - (pos[i] - 1);
+		int r = L/2 + (pos[i] - 1);*/
+		int cc = (L - (pos[i]*2-1)) / 2;
+		while (cc--)putchar(' ');
+		for (int j = 0; j < pos[i]; j++){
+			if (j)putchar(' ');
+			putchar('*');
+		}
+		cc = (L - (pos[i] * 2 - 1)) / 2;
+		while (cc--)putchar(' ');
+		puts("");
 
-		for (int j = l; j <= r; j+=2)
-			m[Max - i][j] = '*';
 	}
-	for (int i = 0; i < Max; i++){
+	/*for (int i = 0; i < Max; i++){
 		for (int j = 0; j <= L; j++)
 			putchar(m[i][j]);
 		puts("");
-	}		
+	}	*/
+	//fclose(stdin);
+	//fclose(stdout);
 }
 /*
 有一天空與白遇到了吸血種布拉姆 因為他為了活下去 為了吸一口空的血 於是他們開啟了一場遊戲
@@ -100,4 +122,8 @@ out
 
 */
 //N 5,500
-//長度
+//長度上限10
+/*
+7
+
+*/
