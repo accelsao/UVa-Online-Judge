@@ -1,0 +1,38 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+int F[30000005] = {};
+int main() {
+	for (int i = 1; i <= 30000000; i++) {
+		for (int j = i*2; i + j <= 30000000; j += i) {//j為i的倍數
+			if (((i + j)&(j)) == j)
+				F[i + j]++;
+		}
+	}
+	for (int i = 1; i <= 30000000; i++)
+		F[i] += F[i - 1];
+	int testcase, cases = 0, n;
+	cin>>testcase;
+	while (testcase--) {
+		cin >> n;
+		printf("Case %d: %d\n", ++cases, F[n]);
+	}
+}
+/*
+gcd(A, B) = C = A xor B
+其中滿足 B < A and A mod C = 0，
+然後我們又觀察到 A&C == C，
+也就是說看 bitmask 的話，C 是 A 的 subset。
+*/
+
+/*
+http://morris821028.github.io/2014/05/19/oj/uva/uva-12716/
+*/
