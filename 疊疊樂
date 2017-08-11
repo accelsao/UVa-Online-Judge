@@ -1,34 +1,24 @@
-#include<iostream>
-#include<cmath>
-#include<algorithm>
-#include<cstring>
-#include<cstdio>
-#include<cstdlib>
-#include<string>
-#include<vector>
-using namespace std;
-
 struct box{
 	int w, s;
 	int h;
-}p[6000];
+}p[10000];
 
 bool cmp(box a, box b){
-	return a.s > b.s;
+	return a.s - a.w > b.s - b.w;
 }
-int dp[10005] = {};
-int pos[10005] = {};
+int dp[100005] = {};
+int pos[100005] = {};
 int main(){
 	FILE *stream;
-	//freopen_s(&stream,"c247.in.txt", "r", stdin);
-	//freopen_s(&stream,"c247.out.txt", "w", stdout);
+	//freopen_s(&stream,"c24702in.in.txt", "r", stdin);
+	//freopen_s(&stream,"c24702.out.txt", "w", stdout);
 	int n = 1;
-	/*int seed = 0;
-	srand(seed);*/
+	//int seed = 0;
+	//srand(seed);
 	while (cin >>p[n].w>>p[n].s>>p[n].h,p[n].w)
 		n++;
-	/*n = 20;
-	for (int i = 1; i < n; i++){
+	//n = 9900;
+	/*for (int i = 1; i < n; i++){
 		srand(i);
 		p[n].w = rand() * 10 % 100000 + 1;
 		p[n].s = rand() * 10 % 100000 + 1;
@@ -46,22 +36,19 @@ int main(){
 	for (int i = 1; i < n; ++i)
 		for (int j = Max + 1; j >= 1; --j)
 			if (dp[j - 1]>p[i].w&&p[i].h<=pos[j-1]){
+				//Max = max(Max, j);//當前要新增的位置
 				Max = max(Max, j);//當前要新增的位置
 				int k = min(dp[j - 1] - p[i].w, p[i].s - p[i].w);
 				if (dp[j] < k){
-					dp[j] = k;
-					//pos[Max] = p[i].h;
-					pos[j] = max(pos[j], p[i].h);
+					dp[j] = k;	
+					pos[j] = p[i].h;
+					Max = j;
 				}
-				
 				//max(原負重,min(負重-新加的物重=新的負重,新加的物的負重))//加的物負重可能更小
 			}
 	printf("%d\n", Max);
-	//char m[10050][21] = {};
 	int L = pos[1] * 2 - 1;//pos[] max 10
 	for (int i = Max; i >= 1; i--){
-		/*int l = L/2 - (pos[i] - 1);
-		int r = L/2 + (pos[i] - 1);*/
 		int cc = (L - (pos[i]*2-1)) / 2;
 		while (cc--)putchar(' ');
 		for (int j = 0; j < pos[i]; j++){
@@ -73,11 +60,6 @@ int main(){
 		puts("");
 
 	}
-	/*for (int i = 0; i < Max; i++){
-		for (int j = 0; j <= L; j++)
-			putchar(m[i][j]);
-		puts("");
-	}	*/
 	//fclose(stdin);
 	//fclose(stdout);
 }
@@ -117,13 +99,3 @@ out
  * * * * * * * *
 * * * * * * * * *
 
-
-
-
-*/
-//N 5,500
-//長度上限10
-/*
-7
-
-*/
