@@ -1,0 +1,42 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+#define N 2147483647
+int p[50000] = {};
+vector<int>v;
+int main(){
+	for (int i = 2; i < 46340; i++)
+		if (!p[i]){
+			for (int j = i * 2; j < 46340; j += i)
+				p[j] = 1;
+			v.push_back(i);
+		}
+	int n;
+	int t = 1;
+	while (cin >> n, n){
+		if (n == N){ printf("Case %d: 2147483648\n", t++); continue; }//2147483647 + 1
+		if (n == 1) { printf("Case %d: 2\n", t++); continue; }
+		int num[50001] = {};
+		int k,sum=0,m=n;
+		
+		for (int i = 0; i < v.size() && v[i] <= n; i++){
+			k = 1;
+			while(n%v[i] == 0){
+				k *= v[i];
+				n /= v[i];
+			}
+			if (k != 1)sum += k;
+		}
+		if (sum == m)sum++;
+		else if (n != 1)sum += n;
+		printf("Case %d: %d\n", t++, sum);
+	}
+}
