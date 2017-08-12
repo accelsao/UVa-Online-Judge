@@ -1,0 +1,66 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+int fac[105][2];//[0]質因子 [1]個數
+int c[105];
+const int N = 1e5;
+int num, n, m;
+int a[N + 10];
+void factor(){
+	for (int i = 2; i*i <= m; i++)
+		if (m%i == 0){
+			fac[++num][0] = i;
+			fac[num][1] = 0;
+			do{
+				fac[num][1]++;
+				m /= i;
+			} while (m%i == 0);
+		}
+	if (m > 1){//剩餘質數
+		fac[++num][0] = m;
+		fac[num][1] = 1;
+	}
+}
+bool check(int n, int i){
+
+	//整除條件 m的給個因數都在c 且c的指數>=m ck-1取n 已算過保留 算n-k+1/k就好
+	int x = n - i;//(n-1)-k+1
+	int y = i;//k
+	for (int i = 1; i <= num; i++){
+		int p = fac[i][0];
+		while (x%p == 0){
+			x /= p;
+			c[i]++;//乘
+		}
+		while (y%p == 0){
+			y /= p;
+			c[i]--;//除
+		}
+	}
+	for (int i = 1; i <= num; i++)
+		if (c[i] < fac[i][1])return 0;
+	return 1;
+}
+int main(){
+	while (cin >> n >> m){
+		num = 0;
+		int cnt = 0;
+		factor();
+		memset(c, 0, sizeof(c));
+		for (int i = 1; i < n - 1; i++)//0,n-1 都是1
+			if (check(n, i))
+				a[cnt++] = i + 1;
+		printf("%d\n", cnt);
+		for (int i = 0; i < cnt; i++)
+			printf("%s%d", i ? " " :"", a[i]);
+		puts("");
+	}
+}
