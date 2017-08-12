@@ -1,0 +1,68 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+
+int N;
+int num[100001];
+
+int lis[100001];  //每個數字LIS的表
+int lds[100001];
+int LIS_Max, LDS_Max; // 表示LIS的Stack有幾層(level)
+
+void LIS_function(int i);
+void LDS_function(int i);
+
+vector<int>LIS, LDS;
+vector<int>::iterator it;
+#define scanf scanf_s
+int main(){
+	while (scanf("%d", &N)==1) {
+		LIS.clear(); LDS.clear();
+		LIS_Max = 0, LDS_Max = 0;//放入0 vector.back初始才有值
+		for (int i = 0; i < N; ++i)
+			scanf("%d", &num[i]);
+		LIS.push_back(0); LDS.push_back(0);
+		for (int i = 0, j = N - 1; i < N; ++i, --j) {
+			LIS_function(i);
+			LDS_function(j);
+		}
+		//lis lds 從零開始編號 ex:最大長度是3 值為2 ans=2*2+1 5
+		int Max = 0;
+		for (int i = 0; i < N; ++i)
+			if (min(lis[i], lds[i]) > Max)
+				Max = min(lis[i], lds[i]);
+		printf("%d\n", 2 * Max + 1);
+	}
+}
+void LIS_function(int i){
+	//lis[] 從0開始所以扣1
+	if (num[i] > LIS.back()){
+		LIS.push_back(num[i]);
+		lis[i] = LIS.size()-2;//一開始放入0 因為多扣1
+	}
+	else{
+		it = lower_bound(LIS.begin(), LIS.end(), num[i]);
+		*it = num[i];
+		lis[i] = it - LIS.begin()-1;
+	}
+}
+void LDS_function(int i){
+	if (num[i] > LDS.back()){
+		LDS.push_back(num[i]);
+		lds[i] = LDS.size()-2;
+	}
+	else{
+		it = lower_bound(LDS.begin(), LDS.end(), num[i]);
+		*it = num[i];
+		lds[i] = it - LDS.begin()-1;
+	}
+	
+}
