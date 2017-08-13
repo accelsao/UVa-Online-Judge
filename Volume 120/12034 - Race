@@ -1,0 +1,38 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+int f[1001];
+int c[1001][1001];
+int main(){
+	memset(c, 0, sizeof(c));
+	memset(f, 0, sizeof(f));
+
+	for (int i = 0; i < 1001; i++)
+		c[i][i] = c[i][0] = 1;
+	for (int i = 1; i < 1001; i++)
+		for (int j = 1; j <= i; j++)
+			c[i][j] = (c[i - 1][j] + c[i - 1][j - 1]) % 10056;
+
+	f[0] = f[1] = 1, f[2] = 3;
+	for (int i = 3; i < 1001; i++)
+		for (int j = 1; j <= i; j++){
+			int k = (c[i][j] * f[i - j]) % 10056;
+			f[i] = (f[i] + k) % 10056;
+		}
+
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t;i++){
+		int n;
+		cin >> n;
+		printf("Case %d: %d\n", i, f[n]);
+	}
+}
