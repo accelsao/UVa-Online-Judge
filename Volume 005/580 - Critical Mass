@@ -1,0 +1,30 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+
+long long d[31];
+long long  g[32];
+int main(){
+	int n;
+	
+	d[0] = d[1] = d[2] = 0;
+	g[0] = 1, g[1] = 2, g[2] = 4;
+	for (int i = 3; i < 31; i++){
+
+		d[i] = pow(2, i - 3);
+		for (int j = 2; j <= i - 2; j++)
+			d[i] += g[j - 2] * pow(2, i - j - 2);
+		g[i] = pow(2, i) - d[i];
+	}
+
+	while (cin >> n, n)
+		printf("%lld\n", d[n]);
+}
