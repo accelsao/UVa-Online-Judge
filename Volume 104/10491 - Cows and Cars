@@ -1,0 +1,28 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+
+int main(){
+	double a, b, c;
+	while (cin >> a >> b >> c){
+		printf("%.5lf\n", b*(a + (b - 1)) / (a + b) / (a + b - c - 1));
+		
+	}
+}
+/*
+a+b-c 未開 
+a+b-c-1可選
+
+a/(a+b)* b/(a+b-c-1)
+b/(a+b)* (b-1)/(a+b-c-1)
+
+b*(a+(b-1))/(a+b)/(a+b-c-1)
+*/
