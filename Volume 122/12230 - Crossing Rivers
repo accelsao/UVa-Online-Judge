@@ -1,0 +1,25 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+//  最佳L/v 最壞 L/v+2L/v(船剛開走) 平均2L/v
+int main(){
+	int n; double d;
+	int t = 1;
+	while (cin >> n >> d, n+d){
+		double p, l, v;
+		while (n--){
+			cin >> p >> l >> v;
+			d = d - l + l * 2 / v;
+		}
+		printf("Case %d: %.3lf\n\n", t++, d);
+	}
+
+}
