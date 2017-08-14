@@ -26,17 +26,18 @@ class Node{
 public:
 	int a; int b; int c;
 };
-
-const int nxt[2][4] = { { 0, 1, 0, -1 },
-{ 1, 0, -1, 0 } };
+const int nxt[2][4] = { { 0, 1, 0, -1 }, { 1, 0, -1, 0 } };
 int w, h, n, num;
-int link[20][20], conn[305][7], vis[305][305][305];
+//conn 第0代表不動 1~4 4個方向的相鄰格子編號 第5個方便判斷用 (判斷非0)
+int link[20][20], conn[305][6], vis[305][305][305];
 int beg[3], endd[3];
 int step_fro, step_back,
 back_fro, back_rear,
 fro_fro, fro_rear;
-Node queue_fro[4000000], queue_back[4000000];
+//16777216 16*16*3 
+Node queue_fro[16777216 + 10], queue_back[16777216 + 10];
 char m[20][20];
+//每個非'#' 給編號
 
 void bfs(){
 	int fro_cnt = 1, back_cnt = 1;
@@ -50,16 +51,16 @@ void bfs(){
 	while (fro_fro < fro_rear){
 		++step_fro;
 		while (fro_cnt--){
-			for (int i = 0; pos_a != 0; ++i)
-				for (int j = 0; pos_b != 0; ++j)
-					for (int k = 0; pos_c != 0; ++k){
-						if (beg[2] != 303){
+			for (int i = 0; pos_a; ++i)
+				for (int j = 0; pos_b ; ++j)
+					for (int k = 0; pos_c; ++k){
+						if (beg[2] != 303){//有c點
 							if (pos_a == queue_fro[fro_fro].b && pos_b == queue_fro[fro_fro].a) continue;
 							if (pos_a == queue_fro[fro_fro].c && pos_c == queue_fro[fro_fro].a) continue;
 							if (pos_b == queue_fro[fro_fro].c && pos_c == queue_fro[fro_fro].b) continue;
 							if (pos_a == pos_b || pos_a == pos_c || pos_b == pos_c) continue;
 						}
-						else if (beg[1] != 303){
+						else if (beg[1] != 303){//有b點
 							if (pos_a == queue_fro[fro_fro].b && pos_b == queue_fro[fro_fro].a) continue;
 							if (pos_a == pos_b) continue;
 						}
@@ -79,9 +80,9 @@ void bfs(){
 
 		++step_back;
 		while (back_cnt--){
-			for (int i = 0; pos_A != 0; ++i)
-				for (int j = 0; pos_B != 0; ++j)
-					for (int k = 0; pos_C != 0; ++k){
+			for (int i = 0; pos_A; ++i)
+				for (int j = 0; pos_B ; ++j)
+					for (int k = 0; pos_C; ++k){
 						if (beg[2] != 303){
 							if (pos_A == queue_back[back_fro].b && pos_B == queue_back[back_fro].a) continue;
 							if (pos_A == queue_back[back_fro].c && pos_C == queue_back[back_fro].a) continue;
@@ -111,14 +112,11 @@ void bfs(){
 int main(){
 	while (cin >> w >> h >> n, n){
 		//初始化
-		//memset(m, 0, sizeof(m));
 		memset(vis, 0, sizeof(vis));
 		memset(link, 0, sizeof(link));
 		memset(conn, 0, sizeof(conn));
 		num = step_fro = 0;
 		step_back = 1000;
-
-		//对图进行输入并处理，建立可移动区域的图
 		for (int i = 0; i < h; ++i){
 			for (int j = 0; j < w; j++)
 				cin.get(m[i][j]);
@@ -127,7 +125,8 @@ int main(){
 
 		for (int i = 0; i < h; ++i)
 			for (int j = 0; j < w; ++j)
-				if (m[i][j] != '#')  link[i][j] = ++num;//可走的路編號
+				if (m[i][j] != '#') 
+					link[i][j] = ++num;//可走的路編號
 		for (int i = 0; i < h; ++i)
 			for (int j = 0; j < w; ++j){
 				if (link[i][j]){
@@ -150,5 +149,6 @@ int main(){
 			}
 		bfs();
 		printf("%d\n", step_fro + step_back - 1002);
+		
 	}
 }
