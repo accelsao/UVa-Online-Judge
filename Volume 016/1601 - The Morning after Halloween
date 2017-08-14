@@ -1,3 +1,7 @@
+參考morris 大神
+
+雙向廣搜
+--------------------------------------------------------
 #include<iostream>
 #include<cmath>
 #include<algorithm>
