@@ -1,0 +1,123 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<vector>
+using namespace std;
+
+
+string s;
+map<int, pair<int, int> > mp;//3个字符串的起始终止下标
+const string ss = "*0123456789";
+int maxn;
+int len;
+int num;
+int changetodigit(string t){
+	int l = t.size();
+	int ans = 0;
+	for (int i = 0; i < l; ++i){
+		ans = ans * 10 + t[i] - '0';
+	}
+	return ans;
+}
+bool check(){//检查积是否合法
+	int x = changetodigit(s.substr(mp[0].first, mp[0].second - mp[0].first + 1));
+	int y = changetodigit(s.substr(mp[1].first, mp[1].second - mp[1].first + 1));
+	char str[5];
+	//sprintf(str, 5, "%d", x * y);
+	sprintf(str, "%d", x * y);
+	int l = strlen(str);
+	if (mp[2].second - mp[2].first + 1 != l) return false;//位数不相同
+	for (int i = mp[2].first; i <= mp[2].second; ++i){
+		if (s[i] == '*') continue;
+		if (s[i] != str[i - mp[2].first]) return false;
+	}
+	return true;
+}
+bool leadingzero(int cur){//判断当前下标是否为数字的第一位
+	for (int i = 0; i < 3; ++i){
+		if (mp[i].first == cur) return true;
+	}
+	return false;
+}
+void judge(int cur){
+	if (num > 1) return;//超過一解
+	//cout << mp[1].second << endl;
+	if (cur == mp[1].second + 1){//前兩個得出解 判斷是否乘積後等於第三個
+		if (check()) ++num;
+		return;
+	}
+	//找*
+	if (s[cur] != '*') judge(cur + 1);
+	else{
+		for (int i = 1; i < 11; ++i){
+			if (i == 1 && leadingzero(cur)) continue;
+			s[cur] = ss[i];
+			judge(cur + 1);
+			s[cur] = '*';
+		}
+	}
+}
+bool dfs(int cnt, int cur){
+	if (cnt >= maxn){//maxn 修改的次數  超過修改數 檢查是否得解
+		string tmp = s;
+		num = 0;
+		judge(0);
+		s = tmp;
+		if (num == 1)
+			return true;
+		return false;
+	}
+	if (cur == len) return false;
+	if (s[cur] == ' '){
+		if (dfs(cnt, cur + 1)) return true;
+		return false;
+	}
+	else{//以下 修改
+		char c = s[cur];
+		for (int i = 0; i < 11; ++i){//字典序
+			if (i == 1 && leadingzero(cur)) continue;
+			if (c == ss[i]){//如果当前要修改的数与即将被修改的数相同
+				if (dfs(cnt, cur + 1)) return true;
+			}
+			else{
+				s[cur] = ss[i];
+				if (dfs(cnt + 1, cur + 1)) return true;
+				s[cur] = c;
+			}
+		}
+		return false;
+	}
+}
+int main(){
+	int kase = 0;
+	while (getline(cin, s)){
+		if (s[0] == '0') return 0;
+		len = s.size();
+		int cnt = 0;
+		int st = 0;
+		//把abc分開存
+		for (int i = 0; i < len; ++i){
+			if (s[i] == ' '){
+				mp[cnt++] = pair<int, int>(st, i - 1);
+				st = i + 1;
+			}
+		}
+
+		//c
+		mp[cnt++] = pair<int, int>(st, len - 1);
+
+		printf("Case %d: ", ++kase);
+		for (maxn = 0;; ++maxn){//遞迴修改數量
+			if (dfs(0, 0)){
+				printf("%s\n", s.c_str());
+				break;
+			}
+		}
+	}
+}
