@@ -1,0 +1,110 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+int main(){
+	FILE *stream;
+	//freopen_s(&stream, "c244.00.in.txt", "r+", stdin); 
+	freopen_s(&stream, "c244.00.out.txt", "w+", stdout);
+
+	int t;
+	//t = 200;
+
+	cin >> t;
+	for (int i = 1; i <= t; i++){
+		long long s1, v1, s2, v2;
+		int n;
+		srand(i);
+		/*//s1很大
+		
+		s1 = rand() * 165521 % 2147483547;
+		n = s1+rand()%10000;
+		srand(i+10);
+	
+		srand(i+15);
+		s2 = rand() * 12456 % 2146483647;
+		srand(i+20);
+		v2 = rand() * 65546 % 1147483647;
+		v1 = rand() * 74126 % 2001483647;*/
+		//s2很大
+
+		/*s2 = rand() * 568462 % 2047483547;
+		n = s2 + rand() % 10000;
+		srand(i+15);
+		s1 = rand() * 65899 % 2146483647;
+	
+		srand(i+20);
+		v2 = rand() * 25546 % 2100483647;
+		v1 = rand() * 84126 % 2001483647;*/
+
+		/*n = rand() * 100000 % 2047483547 + 653842;
+
+		s2 = rand() * 5682 % 83547;
+		s1 = rand() * 6589 % 69324;
+		srand(i+20);
+		v2 = rand() * 1246 % 80483647;
+		v1 = rand() * 62126 % 60148367;
+		printf("%d %lld %lld %lld %lld\n", n, s1, v1, s2, v2);*/
+
+		cin >> n >> s1 >> v1 >> s2 >> v2;
+		long long ans = 0;
+		int a = max(s1, s2), b = n / s1, c = n / s2;//三種時間複雜度
+		if (a < b&&a<c)
+			if (s2*v1 > s1*v2)//寶物2拿最多s1-1個 否則換成拿s2*v1比較好//相乘int 會溢位
+				for (int k = 0; k < s1; k++)//窮舉寶物2 0~s1-1
+					ans = max(ans, (n - k*s2) / s1*v1 + k*v2);
+			else//寶物1最多s2-1個
+				for (int k = 0; k < s2; k++)//窮舉寶物1 0~s2-1
+					ans = max(ans, (n - k*s1) / s2*v2 + k*v1);
+		else if (b < c)//n/s1比較小 窮舉寶物1
+			for (int k = 0; k <= n / s1; k++)
+				ans = max(ans, (n - k*s1) / s2*v2 + k*v1);
+		else//窮舉2
+			for (int k = 0; k <= n / s2; k++)
+				ans = max(ans, (n - k*s2) / s1*v1 + k*v2);
+		printf("Case #%d: %lld\n", i, ans);
+	}
+	//fclose(stdin);
+	fclose(stdout);
+}
+/*
+
+一千九百年前位於南海貝奧魯斯卡的某孤島上,發現直徑約一公里的巨形深淵 
+其深淵有著某未知磁場 想知道深淵裡更多的秘密 只能親身下去探索
+有一位見習赤笛少女 RIKO 是傳說中探窟家白笛「殲滅之萊莎」的女兒
+某天巧遇了一個robot REGU 便一起了冒險 同時 
+為了見到在深層的母親 他們踏上了前往深淵深層的旅途
+有一天
+RIKO發現了好多的遺物-太陽玉等等
+她想把所有東西都帶走 可是她背不了那麼多東西
+她還依稀記得這些遺物可以賣出的價錢
+所以 他決定在最喜歡的兩樣東西 根據價錢
+在這兩種東西中各挑一些
+然後要帶走最高價值的遺物
+RIKO究竟能帶走多少呢~
+
+輸入
+第一行輸入T 代表T(1<=T<=1000)個測資
+然後來T行輸入 5個intergers N,s1,v1,s2,v2
+依序代表 他能背的容量,第一樣東西的體積,價錢 ,第二樣東西的體積,價錢 
+
+輸出
+帶走的總價值
+
+sample input
+2
+100 1 1 2 2
+100 34 34 5 3
+Sample Output
+Case #1: 100
+Case #2: 86
+*/
