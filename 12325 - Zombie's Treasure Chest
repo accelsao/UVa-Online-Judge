@@ -1,0 +1,38 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+int main(){
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t; i++){
+		long long s1, v1, s2, v2;
+		int n;
+		cin >> n >> s1 >> v1 >> s2 >> v2;
+		long long ans = 0;
+		int a = max(s1, s2), b = n / s1, c = n / s2;//三種時間複雜度
+		if (a < b&&a<c)
+			if (s2*v1 > s1*v2)//寶物2拿最多s1-1個 否則換成拿s2*v1比較好//相乘int 會溢位
+				for (int k = 0; k < s1; k++)//窮舉寶物2 0~s1-1
+					ans = max(ans, (n - k*s2) / s1*v1 + k*v2);
+			else//寶物1最多s2-1個
+				for (int k = 0; k < s2; k++)//窮舉寶物1 0~s2-1
+					ans = max(ans, (n - k*s1) / s2*v2 + k*v1);
+		else if (b < c)//n/s1比較小 窮舉寶物1
+			for (int k = 0; k <= n / s1; k++)
+				ans = max(ans, (n - k*s1) / s2*v2 + k*v1);
+		else//窮舉2
+			for (int k = 0; k <= n / s2; k++)
+				ans = max(ans, (n - k*s2) / s1*v1 + k*v2);
+		printf("Case #%d: %lld\n", i, ans);
+	}
+}
