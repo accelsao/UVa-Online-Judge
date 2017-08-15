@@ -1,6 +1,7 @@
 # UVa-Online-Judge
+
 uva problem code
 
-there are some uva problem solution here 
+Here are some uva problem solutions  
 
 堀北鈴音<3
