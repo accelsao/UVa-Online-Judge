@@ -1,0 +1,81 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<vector>
+using namespace std;
+
+#define LL long long
+int num[5];
+int a, b, k;
+int N;
+LL ans[10000], v[10000];
+//10 6  6,10 4,6
+LL gcd(LL a, LL b){
+	return !a ? b : gcd(b%a,a);
+}
+bool better(int d){//如果目前解比ans更優 更新ans
+	for (int i = d; i >= 0; i--)
+		if (ans[i] != v[i])
+			return ans[i] == -1 || v[i] < ans[i];
+		return 0;
+}
+bool judge(int n){//題目限制不可使用的數
+	for (int i = 0; i < k; i++)
+		if (n == num[i])return 0;
+	return 1;
+}
+bool dfs(int cur, int from, LL a, LL b){
+	if (cur == N){
+		if (b%a)return 0;//非分數
+		v[cur] = b / a;
+		if (!judge(v[cur]))
+			return 0;
+		if (better(cur))
+			for (int i = 0; i <= cur; i++)
+				ans[i] = v[i];
+		return 1;
+	}
+	bool ok = 0;
+	from = max(from, int(b / a) + 1);//起點
+	for (int i = from;; i++){
+		while (!judge(i))i++;
+	//剩下的N-d+1 全部都1/i 加起來若<=a/b 無解
+		if (b*(N - cur+1) <= i*a)break;//頭cur 尾N 個數 N-cur+1
+		v[cur] = i;
+		LL b2 = b*i;
+		LL a2 = a*i - b;
+		LL g = gcd(a2, b2);
+		if (dfs(cur + 1, i + 1, a2 / g, b2 / g))
+			ok = 1;
+	}
+	return ok;
+}
+void solve(){
+	for (N = 1;; N++){//跑上限
+		memset(ans, -1, sizeof(ans));
+		if (dfs(0, int(b / a) + 1, a, b)){//b/a+1 為滿足1/c<=a/b的最小c
+			printf("%d/%d=", a, b);
+			for (int i = 0; i <= N; i++)
+				printf("1/%lld%c", ans[i], i == N ? '\n' : '+');
+			break;
+		}
+	}
+}
+int main(){
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t; i++){
+		cin >> a >> b >> k;
+		for (int i = 0; i < k; i++)//不可用的數
+			cin >> num[i];
+		printf("Case %d: ", i);
+		solve();
+	
+	}
+}
