@@ -1,0 +1,49 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+
+int dp[1001];
+int p[1001];
+int dfs(int d, int N,int k){
+	if (p[d] == k)return 1;
+	if (d == N)return 0;
+
+	int v = p[0];
+	for (int i = 1; i <= d; i++)
+		v = max(p[i], v);//序列最大數 * 2^(N-d) 若<n 無解
+	if ((v << (N - d)) < k)return 0;
+
+	for (int i = d; i >= 0; i--){//從後開始 數字可能比較大
+		p[d + 1] = p[d] + p[i];
+		if (dfs(d + 1, N, k))return 1;
+		p[d + 1] = p[d] - p[i];
+		if (dfs(d + 1, N, k))return 1;
+	}
+	return 0;
+}
+int solve(int k){
+	if (k == 1)return 0;
+	p[0] = 1;
+	for (int N = 1; N < 13; N++)//13是測出來的
+		if (dfs(0, N, k))return N;
+	return 13;
+}
+int main(){
+	dp[1] = 0;
+	dp[2] = 1;
+	for (int i = 3; i < 1001; i++)
+			dp[i] = solve(i);
+	int n;
+	while (cin >> n, n)
+		printf("%d\n", solve(n));
+}
