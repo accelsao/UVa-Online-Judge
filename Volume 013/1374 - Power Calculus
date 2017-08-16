@@ -47,3 +47,40 @@ int main(){
 	while (cin >> n, n)
 		printf("%d\n", solve(n));
 }
+----------------------------------------------------------------------------------------------
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+int n, N, a[50];
+int dfs(int cur, int now){
+	if (cur > N || now <= 0 || (now << (N - cur)) < n)return 0;
+	if (now == n || (now << (N - cur)) == n)return 1;
+	a[cur] = now;
+	for (int i = cur; i >= 0; i--){
+		if (dfs(cur + 1, now + a[i]))return 1;
+		if (dfs(cur + 1, now - a[i]))return 1;
+	}
+	return 0;
+}
+int c;
+int main(){
+	while (cin >> n, n){
+		c = n-1;
+		for (N = 0; N < 14; N++){
+			while (c)c /= 2, N++;
+			if (dfs(0, 1)){
+				printf("%d\n", N); break;
+			}
+		}
+	}
+}
