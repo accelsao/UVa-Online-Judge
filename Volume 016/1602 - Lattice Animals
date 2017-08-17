@@ -1,0 +1,112 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+
+struct center{
+	int x, y;
+	center(int x = 0, int y = 0) :x(x), y(y){};
+	bool operator<(const center &a)const{
+		return x < a.x || (x == a.x&&y < a.y);
+	}
+};
+
+#define FOR_CELL(c, p) for(polyomino::const_iterator c = (p).begin(); c != (p).end(); ++c)
+const int maxn = 10;
+int ans[maxn + 1][maxn + 1][maxn + 1];
+typedef set<center>polyomino;//幫set<center> 命名 polyomino 
+set<polyomino>poly[maxn+1];
+
+
+inline polyomino normalize(const polyomino &p){
+	int mx = p.begin()->x, my = p.begin()->y;
+	FOR_CELL(c, p){
+		mx = min(mx, c->x);
+		my = min(my, c->y);
+	}
+	polyomino p2;
+	FOR_CELL(c, p)
+		p2.insert(center(c->x - mx, c->y - my));
+	
+	return p2;
+}
+inline polyomino rotate(const polyomino &p){
+	polyomino p2;
+	FOR_CELL(c, p)
+		p2.insert(center( c->y, -c->x ));//x,y 順時針 y,-x
+	return normalize(p2);
+}
+inline polyomino flip(const polyomino &p){
+	polyomino p2;
+	FOR_CELL(c, p)
+		p2.insert(center( c->x, -c->y ));//翻轉 x,-y
+	return normalize(p2);
+}
+int dir[4][2] = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
+void check_p(const polyomino &p0,const center &c){
+	polyomino p = p0;
+	p.insert(c);
+	p = normalize(p);
+
+	int n = p.size();
+	for (int i = 0; i < 4; i++){
+		if (poly[n].count(p))return;
+		p = rotate(p);
+	}
+	p = flip(p);
+	for (int i = 0; i < 4; i++){
+		if (poly[n].count(p))return;
+		p = rotate(p);
+	}
+	poly[n].insert(p);
+}
+
+void generate(){
+	polyomino s;
+	s.insert(center( 0, 0 ));
+	poly[1].insert(s);
+	
+	//generate
+	for (int i = 2; i <= maxn; i++){
+		for (set<polyomino>::iterator p = poly[i - 1].begin(); p != poly[i - 1].end(); ++p)
+			for (polyomino::iterator c = (*p).begin(); c != (*p).end(); c++){
+				for (int d = 0; d < 4; d++){
+					center n(c->x + dir[d][0], c->y + dir[d][1]);
+					if (p->count(n) == 0)
+						check_p(*p, n);
+				}
+			}
+	}
+	//precompute ans
+	for (int n = 1; n <= maxn; n++)
+		for (int w = 1; w <= maxn;w++)
+			for (int h = 1; h <= maxn; h++){
+				int cnt = 0;
+				for (set<polyomino>::iterator p = poly[n].begin(); p != poly[n].end(); p++){
+					int mx=0, my=0;
+					FOR_CELL(c, *p){
+						mx = max(mx, c->x);
+						my = max(my, c->y);
+					}
+					if (min(mx, my) < min(h, w) && max(mx, my) < max(h, w))
+						cnt++;
+				}
+				ans[n][w][h] = cnt;
+			}
+}
+#define scanf scanf_s
+int main(){
+	generate();
+	int n, w, h;
+	while (scanf("%d%d%d", &n, &w, &h) == 3) 
+		printf("%d\n", ans[n][w][h]);
+}
