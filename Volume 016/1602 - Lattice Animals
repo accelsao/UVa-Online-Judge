@@ -26,7 +26,7 @@ int ans[maxn + 1][maxn + 1][maxn + 1];
 typedef set<center>polyomino;//幫set<center> 命名 polyomino 
 set<polyomino>poly[maxn+1];
 
-
+//讓最小點0,0 來判重比較方便
 inline polyomino normalize(const polyomino &p){
 	int mx = p.begin()->x, my = p.begin()->y;
 	FOR_CELL(c, p){
