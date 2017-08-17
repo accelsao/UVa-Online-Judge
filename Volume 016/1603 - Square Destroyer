@@ -1,0 +1,74 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+const int M = 60;
+int N,n;
+int s, size[M], fullsize[M], contains[M][M]; // squares 
+int exist[M];
+void init(){
+	int m, v;
+	cin >> n >> m;
+	for (int i = 0; i < 2 * n*(n + 1); i++)exist[i] = 1;
+	for (int i = 0; i < m; i++)cin >> v, exist[v-1] = 0;
+
+	//collect full squares
+	s = 0;
+	memset(contains, 0, sizeof(contains));
+	for (int i = 1; i <= n; i++)//side lenth
+		for (int x = 0; x <= n - i; x++)
+			for (int y = 0; y <= n - i; y++){
+				size[s] = 0;
+				fullsize[s] = 4 * i;//complete square
+				for (int j = 0; j < i; j++){
+					int a = x * (2 * n + 1) + y + j;//up
+					int b = (x + j)*(2 * n + 1) + y + n + i;//right
+					int c = (x + i)*(2 * n + 1) + y + j;//down
+					int d = (x + j)*(2 * n + 1) + y + n;//left
+					contains[s][a] = 1;
+					contains[s][b] = 1;
+					contains[s][c] = 1;
+					contains[s][d] = 1;
+					size[s] += exist[a] + exist[b] + exist[c] + exist[d];
+				}
+				s++;
+			}
+}
+int find(){
+	for (int i = 0; i < s; i++)
+		if (size[i] == fullsize[i])return i;
+	return -1;
+}
+void dfs(int d){
+	if (d >= N)return;
+	int k = find();
+	if (k < 0){ N = d; return; }
+
+	for (int i = 0; i < 2 * n*(n + 1); i++)
+		if (contains[k][i]){//i 編號
+			for (int j = 0; j < s; j++)
+				if (contains[j][i])size[j]--;
+			dfs(d + 1);
+			for (int j = 0; j < s; j++)
+				if (contains[j][i])size[j]++;
+		}
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--){
+		init();
+		N = n*n;
+		dfs(0);
+		printf("%d\n", N);
+	}
+}
