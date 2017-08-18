@@ -1,0 +1,67 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+int p[25];
+int w[25];
+int con[25][25];
+int k;
+vector<int>ans;
+int m,c;
+int find(int n){
+	return  p[n] == n ? n : find(p[n]);
+}
+void dfs(int n){
+	if (n == k){
+		printf("1");
+		for (int i = 0; i < ans.size(); i++)
+			printf(" %d", ans[i]);
+		puts("");
+		c++;
+	}
+	for (int i = 1; i <= m; i++)
+		if (i != n&&!w[i]&&con[n][i]){
+			ans.push_back(i);
+			w[i] = 1;
+			dfs(i);
+			w[i] = 0;
+			ans.pop_back();
+		}
+}
+int main(){
+	int t = 1;
+	while (cin >> k){
+		int a, b;
+		c = 0;
+		ans.clear(); memset(con, 0, sizeof(con));
+		for (int i = 0; i < 25; i++)p[i] = i,w[i]=0;
+		while (cin >> a >> b,a){
+			m = max(m, max(a, b));
+			int x = find(a);
+			int y = find(b);
+			con[a][b] = con[b][a] = 1;
+			if (x != y)
+				if (w[x]>w[y])w[x]++, p[y] = x;
+				else w[y]++, p[x] = y;
+
+		}
+		for (int i = 1; i <= m; i++)w[i] = 0;
+		w[1] = 1;
+		printf("CASE %d:\n", t++);
+		if (find(1) != find(k))
+			printf("There are 0 routes from the firestation to streetcorner %d.\n", k);
+		else{
+			dfs(1);
+			printf("There are %d routes from the firestation to streetcorner %d.\n", c, k);
+		}
+	}
+}
