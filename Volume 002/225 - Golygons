@@ -1,0 +1,88 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<vector>
+using namespace std;
+
+int obs[500][500];
+int tmp = 215;//coordinates justify
+int n, k;
+char dir[4] = { 'e', 'n', 's', 'w' };
+const int d[4][2] = { { 1, 0 }, { 0, 1 }, { 0, -1 }, { -1, 0 } };
+int s;
+//bool zero = 0;
+int sum[21];
+//21*10
+vector<char>ans;
+bool judge(int x,int y,int k, int step){
+	for (int i = 1; i <= step; i++){
+		x += d[k][0]; y += d[k][1];
+		//if (x > tmp * 2 || y > tmp * 2)continue;
+		if (obs[x][y]==-1)return 1;//cant be obstacle
+	}
+	//if step > dist((x,y),(0,0)) no solutions
+	if (abs(x - tmp) + abs(y - tmp) > sum[n] - sum[k])return 1;
+	return 0;	
+}
+void dfs(int x, int y,int c,int w){
+	if (c > n){
+		if (x == tmp&&y == tmp){
+			for (int i = 0; i < ans.size(); i++)
+				cout << ans[i];
+			puts("");
+			s++;//count golygons 
+		}
+		return;
+	}
+
+	for (int i = 0; i < 4; i++){
+		if (i == w || i + w == 3)continue;
+		if (judge(x, y, i, c))continue;
+		int p = x + d[i][0] * c, q = y + d[i][1] * c;
+		if (obs[p][q]==1)continue;
+		ans.push_back(dir[i]);
+		obs[p][q] = 1;//obs -1 block : 1 have visited
+		dfs(p,q, c + 1, i);
+		obs[p][q] = 0;
+		ans.pop_back();
+	}
+}
+int main(){
+	sum[0] = 0;
+	for (int i = 1; i <= 20; i++)
+		sum[i] = sum[i-1] + i;
+
+	int t;
+	cin >> t;
+	while (t--){
+		cin >> n >> k;
+		for (int i = 0; i <500; i++)
+			for (int j = 0; j <500; j++)
+				obs[i][j] = 0;
+			s = 0; ans.clear();
+			int x, y;
+			for (int i = 0; i < k; i++){
+				cin >> x >> y;
+				obs[x + tmp][y + tmp] = -1;
+			}
+			dfs(tmp, tmp,1,-1);
+			printf("Found %d golygon(s).\n\n",s);
+	}
+}
+
+/*
+1.不能穿越障礙物 所以設障礙物-1
+2.走過的停留"點" 不能經過2次 設為1 
+"經過"的路因為可以走過 停留"點" 所以 兩個"不可經過點"不能都設一樣
+
+停留點檢查是否重複
+經過點檢查是否有障礙物
+
+*/
