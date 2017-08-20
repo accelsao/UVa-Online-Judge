@@ -1,0 +1,71 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<unordered_map>
+using namespace std;
+
+int num[101];
+char ans[101];
+int main(){
+	string s;
+	while (getline(cin, s), s != "*"){
+		int f, t, n = s.size();
+		if (isdigit(s[0])){
+			f = 10, t = 26;
+			for (int i = 0; i < n; i++)
+				num[i] = s[n - 1 - i] - '0';
+			//倒過來存
+		}
+		else{
+			f = 26, t = 10;
+			for (int i = 0; i < n; i++)
+				num[i] = s[n - 1 - i] - 'a' + 1;
+		}
+		for (int i = 0; i < n * 2; i++){
+			int left = 0;
+			for (int j = n; j >= 0; j--){
+				left = left*f + num[j];
+				num[j] = left / t;
+				left = left%t;
+			}
+			ans[i] = left;
+		}
+		int k = n * 2 - 1;
+		while (!ans[k])k--;
+
+		if (t == 10){
+			cout << s;
+			int r = 22 - n;
+			while (r--)putchar(' ');
+		}
+		for (int i = k; i >= 0; i--){
+			if (t == 26)
+				putchar(ans[i] + 'a' - 1);
+			else{
+				putchar(ans[i] + '0');
+				if (i&&i % 3 == 0)
+					putchar(',');
+			}
+		}
+		if (t == 26){
+			for (int j = k; j <= 20; j++)
+				putchar(' ');
+			for (int j = 0; j < n; j++){
+				putchar(s[j]);
+				if (j < n - 1 && (n - j) % 3 == 1)
+					putchar(',');
+			}
+		}
+		puts("");
+	}
+}
