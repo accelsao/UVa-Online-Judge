@@ -103,3 +103,49 @@ int main(){
 		printf("%d\n-\n", tail);
 		output(Q[tail]);
 }
+---------------------------------------------------------------------
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<unordered_map>
+using namespace std;
+
+int pos[1000005] = {};
+int main(){
+	int n;
+	vector<int>v, ans;
+	while (cin >> n)v.push_back(n);
+	ans.push_back(v[0]); pos[0] = 1;
+	for (int i = 0; i<v.size();i++)
+		if (v[i] > ans.back()){
+			ans.push_back(v[i]);
+			pos[i] = ans.size();
+		}
+		else{
+			auto it = lower_bound(ans.begin(), ans.end(), v[i]);
+			pos[i] = it - ans.begin() + 1;
+			*it = v[i];
+		}
+	
+	printf("%d\n", ans.size());
+	puts("-");
+	vector<int>print;
+	int j;
+	for (int i = v.size()-1,j=ans.size(); i>=0&&j>0; i--)
+		if (pos[i] == j){
+			print.push_back(v[i]);
+			j--;
+		}
+	for (int i = print.size() - 1; i >= 0; i--)
+		cout << print[i] << endl;
+}
