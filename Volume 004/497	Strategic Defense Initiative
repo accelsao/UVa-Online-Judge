@@ -1,0 +1,58 @@
+-----------------------------------------------n^2
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+void print(vector<int> a, vector<int> p,int i){
+	if (p[i] != -1){
+		print(a, p, p[i]);
+	}
+	cout << a[i] << endl;
+}
+
+
+int main(){
+	int t;
+	string s;
+	cin >> t;
+	getchar();
+	getchar();
+	while (t--){
+		vector<int> a;
+		while (getline(cin, s) && s != ""){
+			stringstream ss(s);
+			int x;
+			ss >> x;
+			a.push_back(x);
+		}
+		vector<int> p(a.size());
+		vector<int> dp(a.size());
+		for (int i = 0; i<a.size(); ++i){
+			p[i] = -1;
+			dp[i] = 1;
+			for (int j = 0; j<i; ++j)
+				if (a[i] > a[j] && dp[j] + 1 > dp[i]){
+					dp[i] = dp[j] + 1;
+					p[i] = j;
+				}
+		}
+		int best = 0;
+		int pos = 0;
+		for (int i = 0; i<a.size(); ++i)
+			if (dp[i] > best){
+				best = dp[i];
+				pos = i;
+			}
+		cout << "Max hits: " << best << endl;
+		print(a, p, pos);
+		if (t)cout << endl;
+	}
+}
+//LIS O(n^2)
