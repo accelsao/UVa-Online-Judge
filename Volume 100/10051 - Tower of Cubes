@@ -1,0 +1,147 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+int p[501][6];
+int dp[501][6];
+int pos[501][6][2];//pos[][][0]第幾個,pos[][][1]哪面朝上
+int trans(int x) {
+	if (x == 0)  return 1;
+	if (x == 1)  return 0;
+	if (x == 2)  return 3;
+	if (x == 3)  return 2;
+	if (x == 4)  return 5;
+	if (x == 5)  return 4;
+	return -1;
+}
+void print(int x, int y) {
+	if (dp[x][y]) {
+		print(pos[x][y][0], pos[x][y][1]);
+	}
+	printf("%d ", x + 1);
+	if (y == 0)  puts("front");
+	else if (y == 1) puts("back");
+	else if (y == 2) puts("left");
+	else if (y == 3) puts("right");
+	else if (y == 4) puts("top");
+	else puts("bottom");
+}
+int main(){
+	int n;
+	int t = 0;
+	while (cin >> n, n){
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < 6; j++){
+				cin >> p[i][j];
+				dp[i][j] = 0;
+			}
+		for (int i = 0; i < n; i++)
+			for (int j = i + 1; j < n; j++)
+				for (int bot = 0; bot < 6; bot++)
+					for (int top = 0; top < 6; top++)
+						if (p[i][bot] == p[j][top]){
+							int x = trans(bot);
+							if (dp[i][x] + 1 > dp[j][top]){
+								dp[j][top] = dp[i][x] + 1;
+								pos[j][top][0] = i;
+								pos[j][top][1] = x;
+							}
+						}
+		int ans = 0;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < 6; j++)
+				ans = max(ans, dp[i][j]);
+
+		if (t)puts("");
+		printf("Case #%d\n", ++t);
+		printf("%d\n", ans + 1);
+		int x, y;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < 6; j++)
+				if (dp[i][j] == ans)
+					x = i, y = j;
+		print(x, y);
+	}
+
+
+}
+---------------------------------------------------------
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+int p[501][6];
+int dp[501][6];
+int pos[501][6][2];//pos[][][0]第幾個,pos[][][1]哪面朝上
+int n;
+int trans(int x) {
+	if (x == 0)  return 1;
+	if (x == 1)  return 0;
+	if (x == 2)  return 3;
+	if (x == 3)  return 2;
+	if (x == 4)  return 5;
+	if (x == 5)  return 4;
+}
+void print(int x, int y) {
+	if (dp[x][y]) 
+		print(pos[x][y][0], pos[x][y][1]);
+	printf("%d ", x + 1);
+	if (y == 0)  puts("front");
+	else if (y == 1) puts("back");
+	else if (y == 2) puts("left");
+	else if (y == 3) puts("right");
+	else if (y == 4) puts("top");
+	else puts("bottom");
+}
+void find(int ans){
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < 6; j++)
+			if (dp[i][j] == ans){	
+				print(i, j);
+				return;
+			}
+}
+int main(){
+	int t = 0;
+	while (cin >> n, n){
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < 6; j++){
+				cin >> p[i][j];
+				dp[i][j] = 0;
+			}
+		for (int i = 0; i < n; i++)
+			for (int j = i + 1; j < n; j++)
+				for (int bot = 0; bot < 6; bot++)
+					for (int top = 0; top < 6; top++)
+						if (p[i][bot] == p[j][top]){
+							int x = trans(bot);
+							if (dp[i][x] + 1 > dp[j][top]){
+								dp[j][top] = dp[i][x] + 1;
+								pos[j][top][0] = i;
+								pos[j][top][1] = x;
+							}
+						}
+		int ans = 0;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < 6; j++)
+				ans = max(ans, dp[i][j]);
+		if (t)puts("");
+		printf("Case #%d\n", ++t);
+		printf("%d\n", ans + 1);
+		find(ans);
+	}
+}
