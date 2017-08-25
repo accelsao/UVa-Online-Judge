@@ -36,25 +36,27 @@ int g(int n, int k){
 }
 int main(){
 	FILE *stream;
-	//freopen_s(&stream, "c25400.in.txt","r", stdin);
-	//freopen_s(&stream, "c25400.out.txt", "w", stdout);
+//	freopen_s(&stream, "c25402.out.txt","r", stdin);
+	freopen_s(&stream, "c25402.out.txt", "w", stdout);
 	int t;
 	cin >> t;
-	//t = 10;
+	/*t = 302;
+	printf("%d\n", t);*/
 	while (t--){
 		//srand(t);
 		int n;
 		cin >> n;
-		//n = rand() % 10000 + 1;
+		//n = rand() % 5000 + 1;
 		//printf("%d\n", n);
 		for (int i = 1; i <= n; i++){
 			cin >> p[i].a >> p[i].b >> p[i].d >> p[i].c;
 			/*p[i].a = rand() % 1000 + 1;
 			p[i].b = rand() % 1000 + 1;
 			p[i].d = rand() % 1000 + 1;
-			p[i].c = rand() % 4 + 'A';
-			printf("%d %d %d %c\n", p[i].a, p[i].b, p[i].d, p[i].c);*/
-			p[i].num = i ;
+			p[i].c = 'B';*/
+			//p[i].c = 'D';
+			//printf("%d %d %d %c\n", p[i].a, p[i].b, p[i].d, p[i].c);
+			p[i].num = i;
 		}
 		vector<student>v;
 		v.push_back(p[1]);
@@ -121,5 +123,14 @@ int main(){
 		}
 	}
 	//fclose(stdin);
-	//fclose(stdout);
+	fclose(stdout);
 }
+
+/*
+2,2,B
+2,3 A
+4,4,A
+
+20 19 
+
+*/
