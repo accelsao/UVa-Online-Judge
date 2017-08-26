@@ -3,7 +3,6 @@
 #include<algorithm>
 #include<cstring>
 #include<cstdio>
-#include<cstdlib>
 #include<queue>
 #include<string>
 #include<map>
@@ -21,9 +20,11 @@ struct student{
 	char c;
 }p[10001];
 struct info{
-	double x, s, n;//標準差,學力,號碼
+	double x,s;//標準差,學力,號碼
+        int n;
 };
 bool cmp(info a, info b){
+	if (a.x == b.x)return a.n < b.n;
 	return a.x < b.x;
 }
 int gcd(int a, int b){
@@ -36,26 +37,26 @@ int g(int n, int k){
 }
 int main(){
 	FILE *stream;
-//	freopen_s(&stream, "c25402.out.txt","r", stdin);
-	freopen_s(&stream, "c25402.out.txt", "w", stdout);
+	//freopen_s(&stream, "c25404.in.txt","r", stdin);
+	//freopen_s(&stream, "c25404.out.txt", "w", stdout);
 	int t;
 	cin >> t;
-	/*t = 302;
-	printf("%d\n", t);*/
+	//t = 156;
+	//printf("%d\n", t);
+	
 	while (t--){
 		//srand(t);
 		int n;
 		cin >> n;
-		//n = rand() % 5000 + 1;
-		//printf("%d\n", n);
+		/*n = rand() % 5000 + 1;
+		printf("%d\n", n);*/
 		for (int i = 1; i <= n; i++){
 			cin >> p[i].a >> p[i].b >> p[i].d >> p[i].c;
-			/*p[i].a = rand() % 1000 + 1;
-			p[i].b = rand() % 1000 + 1;
+			/*p[i].a = 100;
+			p[i].b = 500;
 			p[i].d = rand() % 1000 + 1;
-			p[i].c = 'B';*/
-			//p[i].c = 'D';
-			//printf("%d %d %d %c\n", p[i].a, p[i].b, p[i].d, p[i].c);
+			p[i].c = rand() % 2 + 'B';
+			printf("%d %d %d %c\n", p[i].a, p[i].b, p[i].d, p[i].c);*/
 			p[i].num = i;
 		}
 		vector<student>v;
@@ -123,14 +124,5 @@ int main(){
 		}
 	}
 	//fclose(stdin);
-	fclose(stdout);
+	//fclose(stdout);
 }
-
-/*
-2,2,B
-2,3 A
-4,4,A
-
-20 19 
-
-*/
