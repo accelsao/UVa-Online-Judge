@@ -1,0 +1,68 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<unordered_map>
+using namespace std;
+
+struct point{
+	int x, y;
+}p[501];
+int v[125000];
+struct edge{
+	int a, b;
+	double d;
+};
+double dis(int i, int j){
+	return sqrt((p[i].x - p[j].x)*(p[i].x - p[j].x) + (p[i].y - p[j].y)*(p[i].y - p[j].y));
+}
+bool cmp(edge a, edge b){
+	return a.d < b.d;
+}
+int find(int x){
+	return v[x] == x ? x : v[x] = find(v[x]);
+}
+int main(){
+	int t;
+	cin >> t;
+	int n, m;
+	while (t--){
+		cin >> n;
+		for (int i = 0; i < n; i++){
+			cin >> p[i].x >> p[i].y;
+			v[i] = i;
+		}
+		cin >> m;
+		int a, b;
+		for (int i = 0; i < m; i++){
+			cin >> a >> b;
+			a--, b--;
+			a = find(a);
+			b = find(b);
+			if (a != b)
+				v[a] = b;
+		}
+		vector<edge>e;
+		for (int i = 0; i < n - 1; i++)
+			for (int j = i + 1; j < n; j++)
+				e.push_back(edge{ i, j, dis(i, j) });
+		sort(e.begin(), e.end(), cmp);
+		int ans = 0;
+		for (int i = 0; i < e.size(); i++)
+			if (find(e[i].a) != find(e[i].b)){
+				v[find(e[i].a)] = find(e[i].b);
+				printf("%d %d\n", e[i].a + 1, e[i].b + 1);
+				ans++;
+			}
+		if (!ans)puts("No new highways need");
+		if (t)puts("");
+	}
+}
