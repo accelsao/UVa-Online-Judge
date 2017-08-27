@@ -1,3 +1,4 @@
+-------------------------------kruskal
 #include<iostream>
 #include<cmath>
 #include<algorithm>
@@ -89,5 +90,79 @@ int main(){
 				edge.push_back(point{ i, j, d[p[j].x][p[j].y] });
 		}
 		printf("%d\n", k());
+	}
+}
+-----------------------------------------------prim
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+
+struct point{
+	int x, y, d;
+	bool operator<(const point &a)const{
+		return d > a.d;
+	}
+};
+int dir[4][2] = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
+string mp[60];
+int n, m;
+int d[101][101];
+int sx,sy;
+int bfs(){
+	int ans = 0;
+	priority_queue<point>pq;
+	pq.push(point{ sx, sy, 0 });
+	for (int i = 0; i <= n; i++)
+		for (int j = 0; j <= m; j++)
+			d[i][j] = 1e9;
+	d[sx][sy] = 0;
+	while (!pq.empty()){
+		point a = pq.top(); pq.pop();
+		if (mp[a.x][a.y] == 'A'){
+			ans += a.d;
+			a.d = 0;
+			mp[a.x][a.y] = ' ';
+		}
+		for (int k = 0; k < 4; k++){
+			int tx = a.x + dir[k][0];
+			int ty = a.y + dir[k][1];
+			int td = a.d + 1;
+			if (mp[tx][ty] != '#'&&td < d[tx][ty]){
+				d[tx][ty] = td;
+				pq.push(point{ tx, ty, td });
+			}
+		}
+	}
+	return ans;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--){	
+		cin >> m >> n; getchar();	
+		for (int i = 0; i < n; i++)
+			getline(cin, mp[i]);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++)
+				if (mp[i][j] == 'S'){
+					sx = i, sy = j;
+					break;
+				}
+		printf("%d\n",bfs());
 	}
 }
