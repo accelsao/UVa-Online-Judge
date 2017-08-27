@@ -1,0 +1,28 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<sstream>
+using namespace std;
+
+
+int main(){
+	string s;
+	while (getline(cin, s), s != "DONE"){
+		int i, j;
+		for (i = 0, j = s.size() - 1; i < j;i++,j--){
+			while (i<j && (s[i] == '.' || s[i] == ',' || s[i] == '!' || s[i] == '?' || s[i] == ' '))i++;
+			while (i<j&&(s[j] == '.' || s[j] == ',' || s[j] == '!' || s[j] == '?' || s[j] == ' '))j--;
+			if (i>=j||tolower(s[i]) != tolower(s[j]))break;	
+		}
+		if (i>=j)
+			puts("You won't be eaten!");
+		else
+			puts("Uh oh..");
+	}
+}
