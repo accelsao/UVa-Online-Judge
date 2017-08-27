@@ -63,7 +63,6 @@ void bfs(int s){
 		for (int k = 0; k < 4; k++){
 			nxt.x = now.x + dir[k][0];
 			nxt.y = now.y + dir[k][1];
-			nxt.s = now.s + 1;
 			if (nxt.x < 0 || nxt.x >= m || nxt.y < 0 || nxt.y >= n)continue;
 			if (mp[nxt.x][nxt.y] != '#'&&d[nxt.x][nxt.y] > d[now.x][now.y] + 1){
 				d[nxt.x][nxt.y] = d[now.x][now.y] + 1;
