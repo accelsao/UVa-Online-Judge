@@ -1,3 +1,4 @@
+----------------------------kruskal
 #include<iostream>
 #include<cmath>
 #include<algorithm>
@@ -59,5 +60,80 @@ int main(){
 		for (int i = 0; i < n; i++)
 			p[i] = i;
 		printf("Case #%d: %d\n", i, k());
+	}
+}
+--------------------------------------------------------------Borůvka
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+
+struct road{
+	int x, y;
+	int c;
+};
+int p[101];
+int d[101], e[101];
+int n, m;
+int find(int x){
+	return p[x] == x ? x : p[x] = find(p[x]);
+}
+vector<road>v;
+int boruvka(){
+	int ans = 1e9;
+	while (1){
+		int cross_edge = 0;
+		for (int i = 0; i < n; i++)d[i] = 0;
+		for (int i = 0; i < v.size(); i++){
+			int x = find(v[i].x);
+			int y = find(v[i].y);
+			int c = v[i].c;
+			if (x == y)continue;
+			cross_edge++;
+			if (c > d[x] || c == d[x] && i < e[x])
+				d[x] = c, e[x] = i;
+			if (c > d[y] || c == d[y] && i < e[y])
+				d[y] = c, e[y] = i;	
+		}
+		if (!cross_edge)break;
+		for (int i = 0; i < n; i++)
+			if (d[i]){
+				p[find(v[e[i]].x)] = find(v[e[i]].y);
+				ans=min(d[i],ans);
+			}
+	}
+	return ans; 
+}
+
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t;i++){
+		v.clear();
+		cin >> n >> m;
+		int a, b, c;
+		for (int i = 0; i < m; i++){
+			cin >> a >> b >> c;
+			v.push_back(road{ a, b, c });
+		}
+		for (int i = 0; i < n; i++)
+			p[i] = i;
+		printf("Case #%d: %d\n", i, boruvka());
 	}
 }
