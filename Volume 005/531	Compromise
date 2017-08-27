@@ -1,0 +1,57 @@
+
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+int dp[110][110] = {};
+int pos[110][110];
+string p1[110];
+string p2[110];
+
+int main(){
+	while (1){
+		int n1=1, n2=1;
+		while (cin >> p1[n1]&& p1[n1] != "#")n1++;
+		if (n1 == 1)break;
+		while (cin >> p2[n2]&&p2[n2] != "#")n2++;
+			for (int i = 1; i < n1; i++)
+				for (int j = 1; j < n2;j++)
+					if (p1[i] == p2[j]){
+						dp[i][j] = dp[i - 1][j - 1] + 1;
+						pos[i][j] = 0;//左上
+					}
+					else if (dp[i - 1][j] >dp[i][j - 1]){
+						dp[i][j] = dp[i-1][j];
+						pos[i][j] = 1;//左
+					}
+					else{
+						dp[i][j] = dp[i][j-1];
+						pos[i][j] = 2;//上
+					}
+		
+					vector<string>ans;
+					int i = n1 - 1, j = n2 - 1;
+					while (i&&j){
+						if (pos[i][j] == 0){
+							ans.push_back(p1[i]);
+							i--; j--;
+						}
+						else if (pos[i][j] == 1)
+							i--;
+						else
+							j--;
+					}
+					if (!ans.empty()){
+						cout << ans[ans.size()-1];
+						for (int i = ans.size()-2; i>=0; i--)
+							cout << ' ' << ans[i];
+					}
+					cout << endl;
+	}
+}
