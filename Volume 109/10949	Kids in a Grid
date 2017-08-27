@@ -1,0 +1,67 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<sstream>
+using namespace std;
+
+
+
+int main(){
+	int t;
+	cin >> t;
+	char g[21][21] = {};//grid
+	for (int k = 1; k <= t;k++){
+		int h, w;
+		cin >> h >> w;
+		for (int i = 1; i <= h; i++)
+			for (int j = 1; j <= w; j++)
+				cin >> g[i][j];
+		vector<int> p[128] = {};//33~127
+		int n; 
+		char ww;
+		int x,y;
+		cin >> n >> x >> y;
+		int l1, l2;
+		l1 = n+1;
+		p[g[x][y]].push_back(0);
+		for (int i = 1; i <= n; i++){
+			cin >> ww;
+			if (ww == 'N')x--;
+			else if (ww == 'S')x++;
+			else if (ww == 'E')y++;
+			else y--;
+			p[g[x][y]].push_back(i);
+		}
+		int ans = 0;
+		vector<int>v;
+		v.push_back(-1);
+		cin >> n >> x >> y;
+		l2 = n + 1;
+		for (int i = 0; i < n; i++)	{
+			for (int j = p[g[x][y]].size() - 1; j >= 0; j--){
+				int n = p[g[x][y]][j];
+				if (n > v.back())v.push_back(n);
+				else
+					*lower_bound(v.begin(), v.end(), n) = n;
+			}
+			cin >> ww;
+			if (ww == 'N')x--;
+			else if (ww == 'S')x++;
+			else if (ww == 'E')y++;
+			else y--;
+		}
+		//最後一個
+		for (int j = p[g[x][y]].size() - 1; j >= 0; j--){
+			int n = p[g[x][y]][j];
+			if (n > v.back())v.push_back(n);
+			else
+				*lower_bound(v.begin(), v.end(), n) = n;
+		}	
+		printf("Case %d: %d %d\n", k, l1 - v.size() + 1, l2 - v.size() + 1);
+	}
+}
