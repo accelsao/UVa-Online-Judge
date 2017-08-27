@@ -1,0 +1,71 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+
+struct point{
+	int x, y;
+	double dis;
+}a[800];
+vector<point>v;
+int p[800];
+int n, m;
+double dis(int i, int j){
+	return sqrt((a[i].x - a[j].x)*(a[i].x - a[j].x) + (a[i].y - a[j].y)*(a[i].y - a[j].y));
+}
+bool cmp(point a,point b){
+	return a.dis < b.dis;
+}
+int find(int x){
+	return p[x] == x ? x : p[x] = find(p[x]);
+}
+double k(){
+	double ans = 0;
+	sort(v.begin(), v.end(), cmp);
+	for (int i = 0; i < v.size(); i++){
+		int x = find(v[i].x), y = find(v[i].y);
+		if (x != y){
+			p[x] = y;
+			ans += v[i].dis;
+		}
+	}
+	return ans;
+}
+
+int main(){
+	while (cin >> n){
+		v.clear();
+		for (int i = 0; i < n; i++){
+			cin >> a[i].x >> a[i].y;
+			p[i] = i;
+		}
+		int m, a, b;
+		cin >> m;
+		while (m--){
+			cin >> a >> b;
+			a--, b--;
+			a = find(a);
+			b = find(b);
+			if (a != b)
+				p[a] = b;
+		}
+		for (int i = 0; i < n; i++)
+			for (int j = i + 1; j < n; j++)
+				v.push_back(point{ i, j, dis(i, j) });
+		printf("%.2f\n", k());
+	}
+}
