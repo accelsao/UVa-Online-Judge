@@ -1,0 +1,61 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+int n, m;
+int p[101][101];
+int dp[101][101];
+int path[101][101];
+int main(){
+	while (cin >> n >> m){
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++){
+				cin >> p[i][j];
+				dp[i][j] = p[i][j];
+				path[i][j] = 1e9;
+			}
+		for (int j = m - 2; j >= 0; j--)
+			for (int i = 0; i < n; i++){
+				int up, mid, down;
+				up = p[i][j] + dp[(i - 1 + n) % n][j + 1];
+				mid = p[i][j] + dp[i][j + 1];
+				down = p[i][j] + dp[(i+1)%n][j + 1];
+				if (up <= mid&&up <= down){
+					dp[i][j] = up;
+					path[i][j] = min(path[i][j], (i - 1 + n) % n);
+				}
+				if (mid <= up&&mid <= down){
+					dp[i][j] = mid;
+					path[i][j] = min(path[i][j], i);
+				}
+				if (down <= up&&down <= mid){
+					dp[i][j] = down;
+					path[i][j] = min(path[i][j], (i + 1 ) % n);
+				}
+			}
+		int minp = 1e9, mi = -1;
+		for (int i = 0; i < n;i++)
+			if (dp[i][0] < minp){
+				minp = dp[i][0];
+				mi = i;
+			}
+		int ans = dp[mi][0];
+		printf("%d", mi + 1);
+		for (int i = 0; i < m - 1; i++)
+
+			printf(" %d", path[mi][i] + 1), mi = path[mi][i];
+		printf("\n%d\n", ans);
+	}
+}
