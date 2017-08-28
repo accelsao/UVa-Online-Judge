@@ -1,0 +1,67 @@
+#include<string>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+int A[300];
+char B[105];
+int main() {
+	int T;
+	cin >> T;
+	while (T--) {
+		string s;
+		cin >> s;
+		int A[300] = {};
+		char B[105] = {};
+		int cnt = 0, cnt2 = 0;
+		for (int c = 0; c < s.size();c++) {
+			A[s[c]-'a']++;
+			if (A[s[c]-'a'] % 2) cnt2++;
+			else cnt2--;
+			B[cnt++] = s[c];
+		}
+		if (cnt2 > 1) {
+			printf("Impossible\n");
+			continue;
+		}
+		int len =cnt, ans = 0;
+		for (int i = 0; i < len / 2 + 1; i++) {
+			int l = 0, r = 0;
+			char temp;
+			if (B[i] == B[len - i - 1])	continue;
+			else {
+				for (int j = len - i - 1; j >= 0; j--) {
+					if (B[i] != B[j]) {
+						l++;
+					}
+					else break;
+				}
+				for (int j = i; j < len; j++) {
+					if (B[len - i - 1] != B[j]) {
+						r++;
+					}
+					else break;
+				}
+				if (l <= r) {
+
+					temp = B[len - i - l - 1];
+					for (int j = len - i - l - 1; j < len - i; j++) {
+						B[j] = B[j + 1];
+					}
+					B[len - i] = temp;
+					ans += l;
+				}
+				else {
+					temp = B[i + r];
+					for (int j = i + r; j > i; j--) {
+						B[j] = B[j - 1];
+					}
+					B[i] = temp;
+					ans += r;
+				}
+			}
+		}
+		printf("%d\n", ans);
+	}
+}
+----------------------------------
+參考http://www.voidcn.com/blog/u011251225/article/p-3931407.html
