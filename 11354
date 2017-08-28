@@ -1,0 +1,158 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+const int maxn = 50000 + 10;
+const int INF = 0x3f3f3f3f;
+const int logmaxn = 20;
+
+int n, m;
+
+#define scanf scanf_s
+struct Edge
+{
+	int u, v, d;
+	bool operator < (const Edge& rhs) const
+	{
+		return d < rhs.d;
+	}
+};
+
+Edge e[maxn];
+
+int pa[maxn];
+
+int find(int x){
+	return x == pa[x] ? x : pa[x] = find(pa[x]);
+}
+vector<int> G[maxn], C[maxn];
+
+
+struct LCA{
+	int n;
+	int fa[maxn];
+	int cost[maxn];
+	int L[maxn];
+	int anc[maxn][logmaxn];
+	int maxcost[maxn][logmaxn];
+	void preprocess(){
+		for (int i = 0; i<n; i++){
+			anc[i][0] = fa[i];
+			maxcost[i][0] = cost[i];
+			for (int j = 1; (1 << j)<n; j++)
+				anc[i][j] = -1;
+		}
+
+		for (int j = 1; (1 << j)<n; j++)
+			for (int i = 0; i<n; i++)
+				if (anc[i][j - 1] != -1){
+					int a = anc[i][j - 1];
+					anc[i][j] = anc[a][j - 1];
+					maxcost[i][j] = max(maxcost[i][j - 1], maxcost[a][j - 1]);
+				}
+	}
+	int query(int p, int q){
+		int log = 1;
+		if (L[p]<L[q]) swap(p, q);
+		while ((1 << (log + 1)) <= L[p])log++;
+		//for (log = 1; (1 << log) <= L[p]; log++);
+		//log--;
+
+		int ans = -INF;
+		for (int i = log; i >= 0; i--){
+			if (L[p] - (1 << i) >= L[q]){
+				ans = max(ans, maxcost[p][i]);
+				p = anc[p][i];
+			}
+		}
+		if (p == q) return ans;        //lca 是 p
+
+		for (int i = log; i >= 0; i--)
+		{
+			if (anc[p][i] != -1 && anc[p][i] != anc[q][i])
+			{
+				ans = max(ans, maxcost[p][i]);
+				p = anc[p][i];
+				ans = max(ans, maxcost[q][i]);
+				q = anc[q][i];
+			}
+		}
+
+		ans = max(ans, cost[p]);
+		ans = max(ans, cost[q]);
+
+		return ans;
+		//LCA 是 fa[p] = fa[q];
+	}
+
+};
+
+LCA solver;
+
+void dfs(int u, int fa, int level){
+	solver.L[u] = level;
+	for (int i = 0; i<G[u].size(); i++){
+		int v = G[u][i];
+		if (G[u][i] != fa){
+			solver.fa[v] = u;
+			solver.cost[v] = C[u][i];
+			dfs(G[u][i], u, level + 1);
+		}
+	}
+}
+
+int main(){
+	int t = 0;
+	while (scanf("%d%d", &n, &m) == 2){
+		if (t++)puts("");
+		for (int i = 0; i<m; i++){
+			int u, v, d;
+			scanf("%d%d%d", &u, &v, &d);
+			e[i] = Edge{ u - 1, v - 1, d };
+		}
+		sort(e, e + m);
+		for (int i = 0; i < n; i++){
+			pa[i] = i;
+			G[i].clear();
+			C[i].clear();
+		}
+
+		for (int i = 0; i < m; i++){
+			int v = e[i].v;
+			int u = e[i].u;
+			int fx = find(e[i].u);
+			int fy = find(e[i].v);
+			if (fx != fy){
+				pa[fx] = fy;
+				G[u].push_back(v);
+				C[u].push_back(e[i].d);
+				G[v].push_back(u);
+				C[v].push_back(e[i].d);
+			}
+		}
+		solver.n = n;
+		dfs(0, -1, 0);
+		solver.preprocess();
+		int Q;
+		scanf("%d", &Q);
+		while (Q--){
+			int u, v;
+			scanf("%d%d", &u, &v);
+			u--;
+			v--;
+			printf("%d\n", solver.query(u, v));
+		}
+	}
+}
