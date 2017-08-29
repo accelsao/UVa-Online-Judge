@@ -1,0 +1,91 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+#define M 100001
+int n, m;
+struct edge{
+	int to, d;
+};
+vector<edge>v[M];
+int d[2][M],path[M];
+void bfs(int r,int d[]){
+	queue<int>q;
+	for (int i = 1; i <= n; i++)
+		d[i] = 1e9;
+	d[r] = 0;
+	q.push(r);
+	while (!q.empty()){
+		int x = q.front();
+		q.pop();
+		for (int i = 0; i < v[x].size(); i++){
+			int y = v[x][i].to;
+			if (d[y] == 1e9){
+				d[y] = d[x] + 1;
+				q.push(y);
+			}
+		}
+	}
+}
+void build(int dis){
+	static edge e[M * 2];
+	int q[M * 2];
+	q[0] = 1;
+	int top = 1;
+	for (int i = 0; i < dis; i++){
+		int m = 0;
+		while (top){
+			int x = q[--top];
+			for (int k = 0; k < v[x].size(); k++){
+				int y = v[x][k].to;
+				if (d[0][y] == d[0][x] + 1 && d[1][x] == d[1][y] + 1)
+					e[m++] = v[x][k];
+			}
+		}
+		int mn = 1e9;
+		for (int j = 0; j < m; j++)
+			mn = min(mn, e[j].d);
+		path[i] = mn;
+		for (int j = 0; j < m; j++)
+			if (e[j].d == mn)
+				q[top++] = e[j].to;
+		sort(q, q + top);
+		top = unique(q, q + top) - q;
+	}
+}
+int main(){
+	while (cin >> n >> m){
+
+	/*	for (int i = 0; i < 3; i++)
+			printf("%d%c", i, "a\n"[i==0]);*/
+
+		int a, b, c;
+		for (int i = 1; i <= n; i++)v[i].clear();
+		for (int i = 0; i < m; i++){
+			cin >> a >> b >> c;
+			v[a].push_back(edge{ b, c });
+			v[b].push_back(edge{ a, c });
+		}
+
+		bfs(1, d[0]);
+		bfs(n, d[1]);
+		int dis = d[0][n];
+		build(dis);
+		printf("%d\n", dis);
+		for (int i = 0; i < dis; i++)
+			printf("%d%c", path[i], " \n"[i == dis - 1]);
+	}
+}
