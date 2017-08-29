@@ -15,77 +15,94 @@
 using namespace std;
 
 
-#define M 100001
-int n, m;
-struct edge{
-	int to, d;
+#include <cstdio>
+#include <vector>
+#include <cstring>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+const int maxn = 100000 + 10;
+const int INF = 1000000000 + 10;
+
+struct Edge{
+	int to, c;
+	Edge(int to=0, int c = 0) :to(to), c(c) {}
 };
-vector<edge>v[M];
-int d[2][M],path[M];
-void bfs(int r,int d[]){
-	queue<int>q;
-	for (int i = 1; i <= n; i++)
-		d[i] = 1e9;
-	d[r] = 0;
-	q.push(r);
+
+vector<Edge> G[maxn];
+int n, d[maxn];
+bool vis[maxn];
+vector<int> ans;
+void rev_bfs(){
+	memset(vis, 0, sizeof(vis));
+	queue<int> q;
+	q.push(n);
+	vis[n] = true;
+	d[n] = 0;
 	while (!q.empty()){
-		int x = q.front();
-		q.pop();
-		for (int i = 0; i < v[x].size(); i++){
-			int y = v[x][i].to;
-			if (d[y] == 1e9){
-				d[y] = d[x] + 1;
-				q.push(y);
+		int u = q.front(); q.pop();
+		for (int i = 0; i < G[u].size(); ++i){
+			int v = G[u][i].to;
+			if (!vis[v]){
+				vis[v] = 1;
+				d[v] = d[u] + 1;
+				q.push(v);
 			}
 		}
 	}
 }
-void build(int dis){
-	static edge e[M * 2];
-	int q[M * 2];
-	q[0] = 1;
-	int top = 1;
-	for (int i = 0; i < dis; i++){
-		int m = 0;
-		while (top){
-			int x = q[--top];
-			for (int k = 0; k < v[x].size(); k++){
-				int y = v[x][k].to;
-				if (d[0][y] == d[0][x] + 1 && d[1][x] == d[1][y] + 1)
-					e[m++] = v[x][k];
+
+void bfs(){
+	memset(vis, 0, sizeof(vis));
+	vis[1] = 1;
+	ans.clear();
+	vector<int> next;
+	next.push_back(1);
+	for (int i = 0; i < d[1]; ++i){
+		int min_color = INF;
+		for (int j = 0; j < next.size(); ++j){
+			int u = next[j];
+			for (int k = 0; k < G[u].size(); ++k){
+				int v = G[u][k].to;
+				if (d[u] == d[v] + 1)
+					min_color = min(min_color, G[u][k].c);
 			}
 		}
-		int mn = 1e9;
-		for (int j = 0; j < m; j++)
-			mn = min(mn, e[j].d);
-		path[i] = mn;
-		for (int j = 0; j < m; j++)
-			if (e[j].d == mn)
-				q[top++] = e[j].to;
-		sort(q, q + top);
-		top = unique(q, q + top) - q;
+		ans.push_back(min_color);
+		vector<int> next2;
+		for (int j = 0; j < next.size(); ++j){
+			int u = next[j];
+			for (int k = 0; k < G[u].size(); ++k){
+				int v = G[u][k].to;
+				if (!vis[v] && d[u] == d[v] + 1 && G[u][k].c == min_color){
+					vis[v] = 1;
+					next2.push_back(v);
+				}
+			}
+		}
+		next = next2;
 	}
+	printf("%d\n%d", d[1], ans[0]);
+	for (int i = 1; i < ans.size(); ++i)
+		printf(" %d", ans[i]);
+	puts("");
 }
+
 int main(){
-	while (cin >> n >> m){
-
-	/*	for (int i = 0; i < 3; i++)
-			printf("%d%c", i, "a\n"[i==0]);*/
-
-		int a, b, c;
-		for (int i = 1; i <= n; i++)v[i].clear();
-		for (int i = 0; i < m; i++){
-			cin >> a >> b >> c;
-			v[a].push_back(edge{ b, c });
-			v[b].push_back(edge{ a, c });
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int m, u, v, c;
+	while (cin >> n >> m)	{
+		for (int i = 1; i <= n; ++i) G[i].clear();
+		while (m--)	{
+			cin >> u >> v >> c;
+			if (u == v) continue;  
+			//最短路中一定不含环
+			G[u].push_back(Edge{ v, c });
+			G[v].push_back(Edge{ u, c });
 		}
-
-		bfs(1, d[0]);
-		bfs(n, d[1]);
-		int dis = d[0][n];
-		build(dis);
-		printf("%d\n", dis);
-		for (int i = 0; i < dis; i++)
-			printf("%d%c", path[i], " \n"[i == dis - 1]);
+		rev_bfs();
+		bfs();
 	}
 }
