@@ -1,0 +1,72 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+const int maxn = 100000 + 10;
+struct Edge{
+	int to, c;
+	Edge(int to = 0, int c = 0) :to(to), c(c) {}
+};
+vector<Edge> G[maxn];
+int n,st,ans;
+int d[maxn];
+void dfs(int x){
+	for (int i = 0; i < G[x].size(); i++){
+		Edge v = G[x][i];
+		if (d[v.to] == -1){
+			d[v.to] = d[x] + v.c;
+			if (d[ans] < d[v.to])
+				ans = v.to;
+			dfs(v.to);
+		}
+	}
+}
+void process(){
+	for (int i = 0; i <= st+1; i++)d[i] = -1;
+	d[st] = 0;
+	ans = st;
+	dfs(st);
+	for (int i = 0; i <= st+1; i++)d[i] = -1;
+	d[ans] = 0;
+	dfs(ans);
+	printf("%d\n", d[ans]);
+	for (int i = 1; i <= st; i++)G[i].clear();
+	st = 0;
+}
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	string s;
+	stringstream ss;
+	bool p = 0;
+	while (getline(cin, s)){
+		if (s.size()){
+			ss.clear();
+			ss << s;
+			int  u, v, c;	
+			ss >> u >> v >> c;
+			st = max(st, max(u, v));
+			G[u].push_back(Edge{ v, c });
+			G[v].push_back(Edge{ u, c });
+			p = 0;
+		}
+		else{
+			process();
+			p = 1;
+		}
+	}
+	if (!p)
+		process();
+}
