@@ -1,0 +1,66 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+struct edge{
+	int to, d;
+};
+vector<edge>g[200001];
+int dp[100001],vis[100001];
+map<int, int>r;
+void dfs(int u, int p){
+	vis[u] = 1;
+	for (int i = 0; i < g[u].size(); i++){
+		edge v = g[u][i];
+		if (vis[v.to])continue;
+		dfs(v.to, u);
+	}
+	int ans = 0;
+	for (int i = 0; i < g[u].size(); i++){
+		edge v = g[u][i];
+		if (v.to == p)continue;
+		ans = max(dp[v.to] + v.d + ans, ans);
+	}
+	dp[u] = ans;
+}
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int n;
+	while (cin >> n,n){
+		int x, y, d;
+		for (int i = 1; i <= r.size(); i++)
+			g[i].clear();
+		r.clear();
+		for (int i = 0; i < n; i++){
+			cin >> x >> y >> d;
+			if (!r[x])r[x] = r.size();
+			if (!r[y])r[y] = r.size();
+			x = r[x], y = r[y];
+			g[x].push_back(edge{ y, d });
+			g[y].push_back(edge{ x, d });			
+		}
+		int m = r.size();
+		for (int i = 1; i <= m; i++)
+			dp[i] = vis[i] = 0;
+		for (int i = 1; i <= m; i++)
+			if (!vis[i])dfs(i, -1);
+		int ans = 0;
+		for (int i = 1; i <= m; i++)
+			ans = max(ans, dp[i]);
+		printf("%d\n", ans);
+	}
+}
