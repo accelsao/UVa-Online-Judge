@@ -1,0 +1,91 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+struct edge{
+	int to,num;	
+};
+vector<int>g[100001];
+vector<edge>Q[100001];
+int vis[100001];
+int extra[100001], dp[100001];
+int p[100001], lca[100001], K[100001], X[100001], Y[100001];
+int find(int x){
+	return x == p[x] ? x : p[x] = find(p[x]);
+}
+void tarjan(int u, int pre){
+	p[u] = u;
+	for (int i = 0; i < g[u].size(); i++){
+		if (g[u][i] == pre)continue;
+		tarjan(g[u][i], u);
+		p[g[u][i]] = u;
+	}
+	vis[u] = 1;
+	for (int i = 0; i < Q[u].size(); i++)
+		if (vis[Q[u][i].to])
+			lca[Q[u][i].num] = find(Q[u][i].to);
+}
+int dfs(int u,int p){
+	for (int i = 0; i < g[u].size(); i++){
+		if (g[u][i] == p)continue;
+		dp[u] += dfs(g[u][i], u);
+	}
+	return dp[u];
+}
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int t, cases = 1;
+	cin >> t;
+	while (t--){
+		int n;
+		cin >> n;
+		int a, b;
+		for (int i = 0; i < n; i++)
+			g[i].clear(), vis[i] = 0, Q[i].clear();
+		for (int i = 1; i < n; i++){
+			cin >> a >> b;
+			g[a].push_back(b);
+			g[b].push_back(a);
+		}
+		int m;
+		cin >> m;
+		for (int i = 0; i < m; i++){
+			int x, y, z;
+			cin >> X[i] >> Y[i] >> K[i];
+			Q[X[i]].push_back(edge{ Y[i], i });
+			Q[Y[i]].push_back(edge{ X[i], i });
+		}
+
+		//找lca
+		tarjan(0, -1);
+		for (int i = 0; i < n; i++)dp[i] = extra[i] = 0;
+		for (int i = 0; i < m; i++){
+			extra[lca[i]] += K[i];
+			dp[X[i]] += K[i];
+			dp[Y[i]] += K[i];
+			dp[lca[i]] -= 2*K[i];
+			//那我們增加節點 x, y 的權重 dp[X[i]] += k, dp[Y[i]] += k，
+			//減少其 LCA 的權重 dp[lca(X[i], Y[i])] -= 2k，
+			//然後你會觀察 ans[i] 的部分，權重增加 K[i] 的只會有 u-v 之間的所有節點。
+			
+		}
+		dfs(0, -1);
+		printf("Case #%d:\n", cases++);
+		for (int i = 0; i < n; i++)
+			printf("%d\n", dp[i] + extra[i]);
+	}
+}
