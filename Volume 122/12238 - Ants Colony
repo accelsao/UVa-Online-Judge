@@ -1,0 +1,79 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+struct edge{
+	int to, d;
+};
+vector<edge>g[100001];
+vector<edge>Q[100001];
+int vis[100001];
+long long dp[100001];
+int p[100001],lca[100001];
+int find(int x){
+	return x == p[x] ? x : p[x] = find(p[x]);
+}
+void dfs(int r){
+	p[r] = r;
+	for (int i = 0; i < g[r].size(); i++){
+		int v = g[r][i].to;
+		dfs(v);
+		p[v] = r;
+	}
+	if (vis[r])return;
+	vis[r] = 1;
+	for (int i = 0; i < Q[r].size(); i++){
+		edge v = Q[r][i];
+		if (vis[v.to])
+			lca[v.d] = find(v.to);
+	}	
+	
+}
+vector<edge>q;//詢問x,y 用edge代替
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int n;
+	while (cin >> n,n){
+		int y, d;
+		q.clear();
+		g[0].clear(); Q[0].clear(); dp[0] = vis[0] = 0;
+		for (int i = 1; i < n; i++){
+			g[i].clear(); Q[i].clear();
+			vis[i] = 0;
+			cin >> y >> d;
+			g[y].push_back(edge{ i, d });//y<i 邊都統一小到大
+		}
+		int m;
+		cin >> m;
+		for (int i = 0; i < m; i++){
+			int x, y;
+			cin >> x >> y;
+			Q[x].push_back(edge{ y, i });
+			Q[y].push_back(edge{ x, i });
+			q.push_back(edge{ x, y });
+		}
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < g[i].size(); j++)
+				dp[g[i][j].to] = dp[i] + g[i][j].d;
+		dfs(0);//0當root 開始找 #第一個邊一定是 0,d
+		for (int i = 0; i < m; i++){
+			if (i)putchar(' ');
+			printf("%lld", dp[q[i].to] + dp[q[i].d] - dp[lca[i]] * 2);
+		}
+		puts("");
+	}
+}
