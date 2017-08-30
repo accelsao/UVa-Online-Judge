@@ -1,0 +1,208 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+vector<int> g[2505];
+int dp_down[2505][3], dp_up[2505];
+//int arg_dpd[2505][2], arg_dpu[2505];
+int dp_ldown[2505][2], dp_lup[2505];
+//node as a root, then sub-tree has longest path.
+//but dp_ldown, dp_lup not include root.
+int cutx, cuty, cut;
+void dfs1(int nd, int p) {
+	for (vector<int>::iterator it = g[nd].begin();
+		it != g[nd].end(); it++) {
+		if (*it == p)    continue;
+		dfs1(*it, nd);
+		if (dp_down[nd][2] < dp_down[*it][0] + 1)//比上一個的3st長
+			dp_down[nd][2] = dp_down[*it][0] + 1;
+		//保持[0]1st長 [1]2nd長 [2]3st長
+		if (dp_down[nd][1] < dp_down[nd][2])
+			swap(dp_down[nd][1], dp_down[nd][2]);
+		if (dp_down[nd][0] < dp_down[nd][1])
+			swap(dp_down[nd][0], dp_down[nd][1]);	
+		//子樹的最長路徑不一定經過子節點，因此考慮經過與不經過
+		//左沒經過 右有經過(子樹1st+2nd的長)
+		int hh = max(dp_ldown[*it][0], dp_down[*it][0] + dp_down[*it][1]);
+		if (dp_ldown[nd][1] < hh)
+			dp_ldown[nd][1] = hh;
+		if (dp_ldown[nd][0] < dp_ldown[nd][1])
+			swap(dp_ldown[nd][0], dp_ldown[nd][1]);
+	}
+}
+void dfs2(int nd, int p, int h, int vg) {
+	dp_up[nd] = h;
+	dp_lup[nd] = vg;
+	for (vector<int>::iterator it = g[nd].begin();
+		it != g[nd].end(); it++) {
+		if (*it == p)    continue;
+		int hv = dp_up[nd], gv = dp_lup[nd];
+		if (dp_down[*it][0] + 1 == dp_down[nd][0]) {
+			hv = max(hv, dp_down[nd][1]);
+			gv = max(gv, dp_up[nd] + dp_down[nd][1]);
+		}
+		else {
+			hv = max(hv, dp_down[nd][0]);
+			gv = max(gv, dp_up[nd] + dp_down[nd][0]);
+		}
+		//-------------------------------------------------
+		if (dp_down[nd][0] == dp_down[*it][0] + 1) 
+			gv = max(gv, dp_down[nd][1] + dp_down[nd][2]);
+		
+		else if (dp_down[nd][1] == dp_down[*it][0] + 1) 
+			gv = max(gv, dp_down[nd][0] + dp_down[nd][2]);
+		
+		else 
+			gv = max(gv, dp_down[nd][0] + dp_down[nd][1]);
+		
+		int hh = max(dp_ldown[*it][0], dp_down[*it][0] + dp_down[*it][1]);
+		if (hh == dp_ldown[nd][0])
+			gv = max(gv, dp_ldown[nd][1]);
+		else
+			gv = max(gv, dp_ldown[nd][0]);
+		dfs2(*it, nd, hv + 1, gv);
+	}
+}
+void sdfs(int nd, int p) {
+	for (vector<int>::iterator it = g[nd].begin();
+		it != g[nd].end(); it++) {
+		if (*it == p)    continue;
+		sdfs(*it, nd);
+		int s, t;
+		s = dp_ldown[*it][0];
+		s = max(s, dp_down[*it][0] + dp_down[*it][1]);
+		t = dp_lup[nd];
+		if (dp_down[*it][0] + 1 == dp_down[nd][0])
+			t = max(t, dp_up[nd] + dp_down[nd][1]);
+		else
+			t = max(t, dp_up[nd] + dp_down[nd][0]);
+		int hh = max(dp_ldown[*it][0], dp_down[*it][0] + dp_down[*it][1]);
+		if (hh == dp_ldown[nd][0])
+			t = max(t, dp_ldown[nd][1]);
+		else
+			t = max(t, dp_ldown[nd][0]);
+		if (dp_down[*it][0] + 1 == dp_down[nd][0])
+			t = max(t, dp_down[nd][1] + dp_down[nd][2]);
+		else if (dp_down[*it][0] + 1 == dp_down[nd][1])
+			t = max(t, dp_down[nd][0] + dp_down[nd][2]);
+		else
+			t = max(t, dp_down[nd][0] + dp_down[nd][1]);
+		int newlong = max(max(s, t), (s + 1) / 2 + (t + 1) / 2 + 1);
+		//if(nd == 1278 && *it == 1854)
+		//printf("%2d<->%2d %d %d %d\n", nd, *it, s, t, newlong);
+		if (newlong < cut) {
+			cut = newlong;
+			cutx = nd, cuty = *it;
+		}
+	}
+}
+void getCenter(int s, int t, int n) {
+	int i, j;
+	int indeg[2505] = {};
+	for (i = 1; i <= n; i++) {
+		//printf("%d : ", i);
+		for (j = 0; j < g[i].size(); j++) {
+			if (i == t && g[i][j] == s)  continue;
+			if (i == s && g[i][j] == t)  continue;
+			indeg[g[i][j]]++;
+			//printf("%d ", g[i][j]);
+		}
+		// puts("");
+	}
+	int st[2505] = {};//1->s, 0->t
+	queue<int> Q;
+	Q.push(s);
+	st[s] = 1;
+	while (!Q.empty()) {
+		int tn = Q.front();
+		Q.pop();
+		for (i = 0; i < g[tn].size(); i++) {
+			if (g[tn][i] == t)   continue;
+			if (st[g[tn][i]] == 0) {
+				st[g[tn][i]] = 1;
+				Q.push(g[tn][i]);
+			}
+		}
+	}
+	int linkx, linky;
+	for (i = 1; i <= n; i++) {
+		if (st[i] == 1 && indeg[i] <= 1)
+			Q.push(i);
+	}
+	while (!Q.empty()) {
+		int tn = Q.front();
+		Q.pop();
+		linkx = tn;
+		//printf("ss %d\n", tn);
+		for (i = 0; i < g[tn].size(); i++) {
+			if (st[g[tn][i]] == 0)   continue;
+			if (--indeg[g[tn][i]] == 1)
+				Q.push(g[tn][i]);
+		}
+	}
+	for (i = 1; i <= n; i++) {
+		if (st[i] == 0 && indeg[i] <= 1)
+			Q.push(i);
+	}
+	while (!Q.empty()) {
+		int tn = Q.front();
+		Q.pop();
+		linky = tn;
+		//printf("tt %d\n", tn);
+		for (i = 0; i < g[tn].size(); i++) {
+			if (st[g[tn][i]] == 1)   continue;
+			if (--indeg[g[tn][i]] == 1)
+				Q.push(g[tn][i]);
+		}
+	}
+	printf("%d %d\n", linkx, linky);
+}
+#define scanf scanf_s
+/*
+首先把樹轉換成有根樹，即有一個點是 root，其他點存在父子關係。
+1) 從子樹來的最長路徑，保留 1st, 2nd, 3rd 長
+2) 從父節點來的最長路徑(可能會從某一個葉節點到 root 再到父節點其中不經過 node)
+3) 把子樹當作一個圖，存在的最長路徑，保留 1st, 2nd 長 (此路徑不經過 node)
+4) 將自己當作子樹從原圖替除後，該圖存在的最長路徑 (此路徑不經過 node)
+*/
+int main() {
+	int testcase;
+	int n, x, y;
+	int i, j, k;
+	scanf("%d", &testcase);
+	while (testcase--) {
+		scanf("%d", &n);
+		for (i = 1; i <= n; i++) {
+			g[i].clear();
+			dp_down[i][0] = dp_down[i][1] = dp_down[i][2] = 0;
+			dp_ldown[i][0] = dp_ldown[i][1] = 0;
+			dp_up[i] = 0;
+			dp_lup[i] = 0;
+		}
+		for (i = 1; i < n; i++) {
+			scanf("%d %d", &x, &y);
+			g[x].push_back(y);
+			g[y].push_back(x);
+		}
+		cut = 1e9;
+		cutx = -1, cuty = -1;
+		dfs1(1, 0);
+		dfs2(1, 0, 0, 0);
+		sdfs(1, 0);
+		printf("%d\n", cut);
+		printf("%d %d\n", cutx, cuty);
+		getCenter(cutx, cuty, n);
+	}
+}
