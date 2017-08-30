@@ -27,12 +27,6 @@ int find(int x){
 	return x == p[x] ? x : p[x] = find(p[x]);
 }
 void dfs(int r){
-	p[r] = r;
-	for (int i = 0; i < g[r].size(); i++){
-		int v = g[r][i].to;
-		dfs(v);
-		p[v] = r;
-	}
 	if (vis[r])return;
 	vis[r] = 1;
 	for (int i = 0; i < Q[r].size(); i++){
@@ -40,7 +34,12 @@ void dfs(int r){
 		if (vis[v.to])
 			lca[v.d] = find(v.to);
 	}	
-	
+	//p[r] = r;
+	for (int i = 0; i < g[r].size(); i++){
+		int v = g[r][i].to;
+		dfs(v);
+		p[v] = r;
+	}
 }
 vector<edge>q;//詢問x,y 用edge代替
 int main(){
@@ -50,10 +49,10 @@ int main(){
 	while (cin >> n,n){
 		int y, d;
 		q.clear();
-		g[0].clear(); Q[0].clear(); dp[0] = vis[0] = 0;
+		g[0].clear(); Q[0].clear(); dp[0] =p[0]= vis[0] = 0;
 		for (int i = 1; i < n; i++){
 			g[i].clear(); Q[i].clear();
-			vis[i] = 0;
+			vis[i] = 0; p[i] = i;
 			cin >> y >> d;
 			g[y].push_back(edge{ i, d });//y<i 邊都統一小到大
 		}
