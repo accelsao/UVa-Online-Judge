@@ -1,0 +1,119 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+
+using namespace std;
+
+const int maxn = 50000 + 7;
+int T, n, q, id, ks;
+int fa[maxn], son[maxn], num[maxn], p[maxn], top[maxn], c[maxn], deep[maxn];
+
+vector<int>g[maxn];
+int lowbit(int x) {
+	//返回參數轉為二進位後,最後一個1的位置所代表的數值.
+	return x&-x;
+}
+int sum(int i) {
+	int ans = 0;
+	while (i) {
+		ans += c[i];
+		i -= lowbit(i);
+	}
+	return ans;
+}
+
+void add(int i, int val) {
+	while (i <= n) {
+		c[i] += val;
+		i += lowbit(i);
+	}
+}
+void init() {
+	id = 1;
+	for (int i = 0; i <= n; ++i)
+		g[i].clear(), son[i] = -1, c[i] = 0;
+}
+void dfs(int cur, int f, int dep) {
+	fa[cur] = f;
+	num[cur] = 1;
+	deep[cur] = dep;
+	for (int i = 0; i < g[cur].size(); ++i) {
+		int v = g[cur][i];
+		if (v == f)continue;
+			dfs(v, cur, dep + 1);
+			//num[cur] += num[v];
+			if (son[cur] == -1 || num[v] > num[cur]) {
+				son[cur] = v;
+				num[cur] = 1 + num[v];//速度快很多
+			}
+	}
+}
+
+void link(int cur, int tp) {
+	p[cur] = id++;//重鏈編號節點
+	top[cur] = tp;//cur均屬以tp為根的重鏈
+	if (son[cur] == -1) return;
+	link(son[cur], tp);//子孫加入重鍊 tp不變
+	for (int i = 0; i < g[cur].size(); ++i) {
+		int v = g[cur][i];
+		if (v != fa[cur] && v != son[cur])//v不是cur父親且v不是cur的重兒子
+			link(v, v);//繼續dfs 修改成新的重鏈
+	}
+}
+
+void deal(int u, int v, int w) {
+	int fu = top[u], fv = top[v];
+	while (fu != fv) {
+		if (deep[fu] < deep[fv]) {
+			swap(fu, fv);
+			swap(u, v);
+		}
+		add(p[fu], w); //深
+		add(p[u] + 1, -w);//淺
+		u = fa[fu];
+		fu = top[u];//重鏈編號
+	}
+	if (deep[u] < deep[v]) swap(u, v);
+	add(p[v], w);//淺
+	add(p[u] + 1, -w);//深
+}
+
+#define scanf scanf_s
+
+int main() {
+	scanf("%d", &T);
+	while (T--) {
+		scanf("%d", &n);
+		init();
+		for (int i = 1; i < n; ++i) {
+			int u, v;
+			scanf("%d %d", &u, &v);
+			g[u].push_back(v);
+			g[v].push_back(u);
+		}
+		dfs(0, 0, 0);
+		link(0, 0);
+		int q;
+		scanf("%d", &q);
+		while (q--) {
+			int u, v, w;
+			scanf("%d %d %d", &u, &v, &w);
+			deal(u, v, w);
+		}
+		printf("Case #%d:\n", ++ks);
+		for (int i = 0; i < n; ++i)
+			printf("%d\n", sum(p[i]));
+
+	}
+ }
