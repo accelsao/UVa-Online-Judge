@@ -45,7 +45,7 @@ void bfs(int s, int t) {
 			if (k[now][nxt] <= k[now][pre]) //下一個的速限>=now 不用減速
 				if (d[nxt][now]==1e9) {
 					d[nxt][now] = d[now][pre] + 1;
-					from[nxt][now] = edge{ now,pre };
+					from[nxt][now] = edge{ now,pre };//紀錄
 					q.push(nxt); p.push(now);
 				}		
 		}
@@ -57,11 +57,11 @@ void bfs(int s, int t) {
 		puts("No valid route.");
 		return;
 	}
-	//pair<a,b> 以edge代替
+	
 	for (int i = 1; i <= m.size(); i++) 
 		if (d[t][i] == ans) {
 			edge x = edge{ t,i };
-			while (x.a!=s&&x.b!=0) {
+			while (x.a!=s&&x.b!=0) {//持續往前推
 				cout << N[x.a]<<' ';
 				edge y = from[x.a][x.b];
 				x.a = y.a; x.b = y.b;
