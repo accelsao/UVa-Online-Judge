@@ -16,15 +16,11 @@
 using namespace std;
 
 struct edge {
-	int to, w;
-	/*bool operator<(const edge&a)const {
-		return to < a.to;
-	}*/
-};
+	int a, b;
+
+}from[1001][1001];
 vector<int>g[1001];
-int d[10001][1001], k[10001][1001];
-edge from[1001][1001];
-int n;
+int d[10001][1001], k[10001][1001],n;
 map<string, int>m;
 string N[1001];
 int name(string s) {
@@ -37,7 +33,7 @@ void bfs(int s, int t) {
 	int now, pre, nxt;
 	for (int i = 1; i <= m.size(); i++)
 		for (int j = 1; j <= m.size(); j++)
-			d[i][j] = 0;
+			d[i][j] = 1e9;
 	q.push(s), p.push(0);
 	k[s][0] = 1e9;
 	d[s][0] = 1;
@@ -46,8 +42,8 @@ void bfs(int s, int t) {
 		pre = p.front(); p.pop();
 		for (int i = 0; i < g[now].size(); i++) {
 			nxt = g[now][i];
-			if (k[now][nxt] <= k[now][pre]) 
-				if (!d[nxt][now]) {
+			if (k[now][nxt] <= k[now][pre]) //下一個的速限>=now 不用減速
+				if (d[nxt][now]==1e9) {
 					d[nxt][now] = d[now][pre] + 1;
 					from[nxt][now] = edge{ now,pre };
 					q.push(nxt); p.push(now);
@@ -56,8 +52,7 @@ void bfs(int s, int t) {
 	}
 	int ans = 1e9;
 	for (int i = 1; i <= m.size(); i++)
-		if (d[t][i])
-			ans = min(ans, d[t][i]);
+		ans = min(ans, d[t][i]);
 	if (ans == 1e9) {
 		puts("No valid route.");
 		return;
@@ -66,13 +61,12 @@ void bfs(int s, int t) {
 	for (int i = 1; i <= m.size(); i++) 
 		if (d[t][i] == ans) {
 			edge x = edge{ t,i };
-			while (x.to!=s&&x.w!=0) {
-				cout << N[x.to]<<' ';
-				edge y = from[x.to][x.w];
-				x.to = y.to;
-				x.w = y.w;
+			while (x.a!=s&&x.b!=0) {
+				cout << N[x.a]<<' ';
+				edge y = from[x.a][x.b];
+				x.a = y.a; x.b = y.b;
 			}
-			cout << N[x.to];
+			cout << N[x.a];
 			puts("");
 			break;
 		}
@@ -88,8 +82,6 @@ int main() {
 			x = name(a); y = name(b);
 			g[x].push_back(y);
 			g[y].push_back(x);
-			//g[x].push_back(edge{ y,w });
-			//g[y].push_back(edge{ x,w });
 			k[x][y] = k[y][x] = w;
 		}
 		for (int i = 1; i <= m.size(); i++)
