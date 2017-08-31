@@ -1,0 +1,60 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+
+using namespace std;
+
+
+int e[101],cnt[101];
+int to[101][101], n, m;
+bool spfa() {
+	queue<int>q;
+	int d[101], inq[101];
+	for (int i = 0; i <= n; i++)
+		d[i] = inq[i]=0;
+	d[1] = 100; inq[1] = 1;
+	q.push(1);
+	int  count = 0;
+	while (!q.empty()) {
+		int a = q.front(); q.pop();
+		inq[a] = 0;
+		for (int j = 1; j <= to[a][0]; j++) {
+			int b = to[a][j];
+			if (d[a] + e[b] > d[b]) {
+				d[b] = d[a] + e[b];		
+				if (!inq[b]) {
+					q.push(b);
+					inq[b] = 1;
+					count++;
+				}
+			}
+		}
+		if (d[n] > 0)return 1;
+		if (count >1000000)return 0;
+	}
+	return 0;
+}
+int main() {
+	while (cin >> n, n > 0) {
+		for (int i = 1; i <= n; i++) {
+			cin >> e[i] >> to[i][0];
+			for (int j = 1; j <= to[i][0];j++)
+				cin >> to[i][j];
+		}
+		if (spfa())
+			puts("winnable");
+		else
+			puts("hopeless");
+	}
+}
