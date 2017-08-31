@@ -1,0 +1,102 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+
+using namespace std;
+
+struct edge {
+	int to, w;
+	/*bool operator<(const edge&a)const {
+		return to < a.to;
+	}*/
+};
+vector<int>g[1001];
+int d[10001][1001], k[10001][1001];
+edge from[1001][1001];
+int n;
+map<string, int>m;
+string N[1001];
+int name(string s) {
+	int &a = m[s];
+	if (!a)a=m.size(), N[a] = s;
+	return a;
+}
+void bfs(int s, int t) {
+	queue<int>q, p;
+	int now, pre, nxt;
+	for (int i = 1; i <= m.size(); i++)
+		for (int j = 1; j <= m.size(); j++)
+			d[i][j] = 0;
+	q.push(s), p.push(0);
+	k[s][0] = 1e9;
+	d[s][0] = 1;
+	while (!q.empty()) {
+		now = q.front(); q.pop();
+		pre = p.front(); p.pop();
+		for (int i = 0; i < g[now].size(); i++) {
+			nxt = g[now][i];
+			if (k[now][nxt] <= k[now][pre]) 
+				if (!d[nxt][now]) {
+					d[nxt][now] = d[now][pre] + 1;
+					from[nxt][now] = edge{ now,pre };
+					q.push(nxt); p.push(now);
+				}		
+		}
+	}
+	int ans = 1e9;
+	for (int i = 1; i <= m.size(); i++)
+		if (d[t][i])
+			ans = min(ans, d[t][i]);
+	if (ans == 1e9) {
+		puts("No valid route.");
+		return;
+	}
+	//pair<a,b> 以edge代替
+	for (int i = 1; i <= m.size(); i++) 
+		if (d[t][i] == ans) {
+			edge x = edge{ t,i };
+			while (x.to!=s&&x.w!=0) {
+				cout << N[x.to]<<' ';
+				edge y = from[x.to][x.w];
+				x.to = y.to;
+				x.w = y.w;
+			}
+			cout << N[x.to];
+			puts("");
+			break;
+		}
+}
+int main() {
+	string a,b;
+	int t = 0, x, y, w;
+	while (cin >> n) {
+		if (t++)puts("");
+		m.clear();
+		for (int i = 1; i <= n; i++) {
+			cin >> a >> b >> w;
+			x = name(a); y = name(b);
+			g[x].push_back(y);
+			g[y].push_back(x);
+			//g[x].push_back(edge{ y,w });
+			//g[y].push_back(edge{ x,w });
+			k[x][y] = k[y][x] = w;
+		}
+		for (int i = 1; i <= m.size(); i++)
+			sort(g[i].begin(), g[i].end());
+		cin >> a >> b;
+		x = name(a), y = name(b);
+		bfs(y, x);
+		for (int i = 1; i <= m.size(); i++)g[i].clear();
+	}
+}
