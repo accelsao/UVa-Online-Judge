@@ -1,0 +1,79 @@
+------------------------------------------set
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+vector<long long>p;
+int main(){
+	int t, n;
+	cin >> t;
+	while (t--){
+		p.clear();
+		cin >> n;
+		long long k;
+		for (int i = 0; i < n; i++){
+			cin >> k;
+			p.push_back(k);
+		}
+		set<long long>s;
+		int l = 0, r = 0, ans = 0;
+		while (r < n){
+			while (r < n&&!s.count(p[r]))
+				s.insert(p[r++]);
+			ans = max(ans, r - l);
+			s.erase(p[l++]);
+		} 
+		printf("%d\n", ans);
+	}
+}
+---------------------------------------------------------------------map
+#include<string>
+#include<cstdio>
+#include<iostream>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<cstring>
+#include<sstream>
+#include<set>
+#include<map>
+#include<algorithm>
+#include<functional>
+#include <regex>
+using namespace std;
+
+
+map<int, int>cur;
+map<int, int>::iterator it;
+int main(){
+	int t, n;
+	cin >> t;
+	while (t--){
+		cur.clear();
+		cin >> n;
+		int k;
+		int l = 0, r = 0, ans = 0;
+		while (r < n){
+			cin >> k;
+			if ((it = cur.find(k)) != cur.end() && it->second >= l){//找到曾出現過的&&上次出現的位置比l大 所以不能再延伸 更新l值
+				ans = max(ans, r - l);
+				l = it->second + 1;
+			}
+			cur[k] = r++;
+		} 
+		printf("%d\n", max(ans, r - l));
+	}
+}
