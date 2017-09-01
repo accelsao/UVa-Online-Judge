@@ -1,0 +1,73 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+int n, s;
+map<string, int>R;
+string c[150];
+int g[121][121];
+void ign(int pre, int now){
+	for (int i = 0; i < n;i++)
+		if (g[now][i]){
+			ign(pre, i);
+			if (pre != now&&g[pre][i])
+				g[pre][i] = 0;
+		}		
+}
+int main(){
+	int t;
+	cin >> t;
+	string s;
+	while (t--){
+		cin >> n;
+		for (int i = 0; i < n; i++){
+			cin >> s;
+			R[s] = i;
+			c[i] = s;
+			for (int j = 0; j < n; j++)
+				g[i][j] = 0;
+		}
+		int p,m;
+		cin >> p;
+		string c1,c2;
+		for (int i = 0; i < p; i++){
+			cin >> c1 >> m;
+			for (int j = 0; j < m; j++){
+				cin >> c2;
+				g[R[c1]][R[c2]] = 1;
+			}
+		}
+		for (int i = 0; i < n; i++)//把被包含的忽略 if(g[B][C]==1)且if(g[A][C]=1) A->C=0
+			ign(i, i);
+		vector<pair<string, vector<string>>>v;
+		for (int i = 0; i < n; i++){
+			string now = c[i];
+			vector<string>in;
+			for (int j = 0; j < n; j++)
+				if (g[i][j])in.push_back(c[j]);
+			sort(in.begin(), in.end());
+			if (in.size())
+			v.push_back(make_pair(now, in));
+		}
+		sort(v.begin(), v.end());
+		for (int i = 0; i < v.size(); i++){
+			cout << v[i].first<<' ';
+			cout << v[i].second.size();
+			for (int j = 0; j < v[i].second.size(); j++)
+				cout << ' ' << v[i].second[j];
+			puts("");
+		}
+	}
+}
