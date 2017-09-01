@@ -1,0 +1,53 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+string a,b;
+vector<char>v[100];
+vector<char>ans;
+int d[101] = {};
+int vis[101] = {};
+void dfs(int i){
+	if (vis[i]==1)return;
+	vis[i] = 1;//已找過
+	for (char n : v[i])
+		if (!vis[n])//沒走過
+			dfs(n);
+	vis[i] = 2;
+	ans.push_back(i);
+}
+int main(){
+	cin >> a;
+	while (cin >> b, b != "#"){
+		int L = min(a.size(), b.size());
+		for (int i = 0; i < L; i++){
+			if (!d[a[i]])d[a[i]] = 1;
+			if (!d[b[i]])d[b[i]] = 1;
+			if (a[i] != b[i]){
+				v[a[i]].push_back(b[i]);
+				d[b[i]] = 2;
+				break;
+			}
+		}
+		a = b;
+	}
+	for (int i = 'A'; i <= 'Z'; i++)
+			if (d[i] == 1)
+				dfs(i);
+	for (int i = ans.size() - 1; i >= 0; i--)
+			cout << ans[i];
+		cout << endl;
+}
