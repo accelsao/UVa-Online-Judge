@@ -1,0 +1,62 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+int n;
+int d[26];
+int m[26][26],v[26];
+char ans[26];
+void dfs(int x){
+	if (x == n){
+		ans[x] = '\0';
+		puts(ans);
+		return;
+	}
+	for (int i = 0; i < 26; i++)
+		if (d[i] && !v[i]){
+			for (int j = 0; j < 26; j++)
+				if (v[j]&&m[i][j])//現在是i  找已經用過的j a~z但若 i要<j(m[i][j]=true) 代表不可用i  
+					return;//j 相當於上個數字 若m[i][j]=ture 則不能用這個i
+			v[i] = 1;
+			ans[x] = i + 'a';
+			dfs(x + 1);
+			v[i] = 0;
+		}	
+}
+int main(){
+	stringstream ss;
+	string s;
+	int t = 0;
+	char a,b;
+	while (getline(cin, s)){
+
+		memset(d, 0, sizeof(d));
+		memset(m, 0, sizeof(m));
+		memset(v, 0, sizeof(v));
+		if (t++)puts("");
+		ss.clear();
+		ss << s;
+		n = 0;
+		while (ss >> a)
+			if (!d[a - 'a'])
+				d[a - 'a'] = 1, n++;
+		getline(cin, s);
+		ss.clear(); ss << s;
+		while (ss >> a >> b)
+			m[a - 'a'][b - 'a'] = 1;//a必須在b前面
+		dfs(0);
+	}
+}
