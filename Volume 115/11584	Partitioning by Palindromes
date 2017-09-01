@@ -1,0 +1,58 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<sstream>
+using namespace std;
+
+string s;
+int dp[1001] = {};
+bool m[1001][1001] = {};
+int len;
+void build(){
+	for (int i = 0; i < len; i++){
+		int l = i, r = i;
+		while (l >= 0 && r < len&&s[l] == s[r]){
+			m[l][r] = 1;
+			l--, r++;
+		}
+	}
+	for (int i = 0; i < len - 1; i++){
+		int l = i, r = i + 1;
+		while (l >= 0 && r < len&&s[l] == s[r]){
+			m[l][r] = 1;
+			l--, r++;
+		}
+	}
+}
+int find(){
+	for (int j = 1; j < len; j++)
+		for (int i = 0; i <= j; i++)
+			if (m[i][j])
+				if (i)
+					dp[j] = min(dp[j], dp[i - 1] + 1);//dp[i-1](回文左邊的方法數)+1(回文) ex:dabba d(dp[i-1])+ abba(1)
+				else
+					dp[j] = 1;
+	return dp[len - 1];
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--){
+		cin >> s;
+		len = s.size();
+		dp[0] = 1;//dp[i]是s[0]~s[i]的最少回文數 
+		for (int i = 1; i <len; i++)
+			dp[i] = 1e9;
+		for (int i = 0; i < len; i++)
+			for (int j = 0; j <len; j++)
+				m[i][j] = 0;
+		build();
+		cout << find() << endl;
+	}
+}
