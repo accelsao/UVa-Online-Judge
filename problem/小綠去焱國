@@ -14,157 +14,61 @@
 #include<unordered_map>
 using namespace std;
 
-/*const int M = 20;
-int d[M][M], dp[M][100000],n;
-int main(){
-	cin >> n;
-	for (int i = 0; i < n; i++){
-		for (int j = i + 1; j < n; j++){
-			cin >> d[i][j], d[j][i] = d[i][j];
-			if (!i)dp[i][j] = d[i][j];
-		}
-	}
-	
-	int mna, mxa;
-	for (int i = 0; i < n; i++)
-		for (int s = 0; s < (1 << n); s++)
-			if (s&(1 << i)){
-				for (int j = 0; j < i; j++)
-					if (!dp[i][s] || dp[i][s]>dp[i - 1][s ^ (1 << i) ^ (1 << j) + d[i][j]])
-						dp[i][s] = dp[i - 1][s ^ (1 << i) ^ (1 << j)] + d[i][j];
-			}
-	printf("%d\n", dp[0][(1 << n) - 1]);
-}*/
-/*
-1 0 1
-1 1 0
-0 1 1
-0 1 1
-1 1 0
-1 0 1
-
-*/
-
 const int N = 20;
-bool b[N];
-int t, ti = 0, n, dis[N][N], dp[N][100000];
-int btb(){
-	int out = 0;
-	for (int i = 0, j = 1; i<n; i++, j *= 2)
-		out += b[i] * j;
-	return out;
-}
+int n, dis[N][N], dp[N][100000];
 void init(){
-	for (int i = 0; i<N; i++){
-		for (int j = 0; j<100000; j++){
-			dp[i][j] =0;
-		}
-	}
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < 100000; j++)
+			dp[i][j] = 0;
 }
-int gcd(int i, int j){
-	int k;
-	while (j%i){
-		k = j / i;
-		j = i;
-		i = k;
-	}
-	return i;
+int gcd(int a, int b){
+	return b?gcd(b, a%b) : a;
 }
 int main(){
-	cin.tie(NULL);
 	cin >> n;
-	//init();
-	for (int i = 0; i < n; i++){
+	for (int i = 0; i < n; i++)
 		for (int j = i + 1; j < n; j++){
 			cin >> dis[i][j];
 			dis[j][i] = dis[i][j];
 		}
-	}
-	int a1 = 1e9, a2 = 0, a3;
-
+	int a1, a2, a3;
 	for (int i = 1; i <= n; i++)
-		for (int s = 1; s < (1 << n); s++){
-		int c = 0, k = s;
-		while (k){
-		if (k & 1)c++; k >>= 1;
-		}
-		if (c != i)continue;
-
-		for (int x = 0; x < n; x++)
-		if (s&(1 << x)){
-		if (i == 1)dp[x][s] = dis[x][0];
-		for (int y = 0; y<n; y++)
-		if (x != y && (s&(1 << y))){
-		if (dp[x][s] == 0 || (dp[x][s] > dp[y][s ^ (1 << x)] + dis[x][y]))
-		dp[x][s] = dp[y][s ^ (1 << x)] + dis[x][y];
-		}
-		}
-		}
-
-		a1 = dp[0][(1 << n) - 1];
-
-	//1 2 4 3 1
-	/*for (int i = 1, j; i <= n; i++){
-		for (int jj = 0; jj < n; jj++){
-			b[n - jj - 1] = (jj < i);
-		}
-		do{
-			j = btb();
-			//				cout<<j<<'\n';
-			for (int x = 0; x < n; x++){
-				if (!b[x])continue;
-				if (i == 1)dp[x][j] = dis[x][0];
-				for (int y = 0; y<n; y++){
-					if (x != y&&b[y]){
-						if (dp[x][j] == 0 || dp[x][j]>dp[y][j ^ (1 << x)] + dis[y][x])
-							dp[x][j] = dp[y][j ^ (1 << x)] + dis[y][x];
-						//							cout<<x<<' '<<y<<' '<<j<<' '<<dp[y][j-(1<<x)]<<' '<<dp[x][j]<<'\n';
-					}
-				}
+		for (int s = 0; s < (1 << n); s++){
+			int c = 0, k = s;
+			while (k){
+				if (k & 1)c++; k >>= 1;
 			}
-		} while (next_permutation(b, b + n));
-	}*/
+			if (c != i)continue;
 
-	a1 = dp[0][(1 << n) - 1];
-	init();
-
-	for (int i = 1; i <= n; i++){
-		for (int s = 1; s < (1 << n); s++)
 			for (int x = 0; x < n; x++)
 				if (s&(1 << x)){
-					if (i == 1)dp[x][s] = dis[0][x];
-					for (int y = 0; y < i; y++)
+					if (i == 1)dp[x][s] = dis[x][0];
+					for (int y = 0; y<n; y++)
+						if (x != y && (s&(1 << y))){
+							if (dp[x][s] == 0 || (dp[x][s] > dp[y][s ^ (1 << x)] + dis[x][y]))
+								dp[x][s] = dp[y][s ^ (1 << x)] + dis[x][y];
+						}
+				}
+		}
+		a1 = dp[0][(1 << n) - 1];
+	init();
+	for (int i = 1; i <= n; i++)
+		for (int s = (1<<n)-1; s >=0; s--){
+			int c = 0, k = s;
+			while (k){
+				if (k & 1)c++; k >>= 1;
+			}
+			if (c != i)continue;
+			for (int x = 0; x < n; x++)
+				if (s&(1 << x)){
+					if (i == 1)dp[x][s] = dis[x][0];
+					for (int y = 0; y < n; y++)
 						if (x != y && (s&(1 << y))){
 							if (dp[x][s] == 0 || dp[x][s] < dp[y][s ^ (1 << x)] + dis[y][x])
 								dp[x][s] = dp[y][s ^ (1 << x)] + dis[y][x];
-							a2 = max(a2, dp[x][s]);
 						}
 				}
-	}
-
-	/*for (int i = 1, j; i <= n; i++){
-		for (int jj = 0; jj<n; jj++){
-			b[n - jj - 1] = (jj<i);
 		}
-		do{
-			j = btb();
-			//				cout<<j<<'\n';
-			for (int x = 0; x<n; x++){
-				if (!b[x])continue;
-				if (i == 1)dp[x][j] = dis[x][0];
-				for (int y = 0; y<n; y++){
-					if (x != y&&b[y]){
-						if (dp[x][j] == 0 || dp[x][j]<dp[y][j - (1 << x)] + dis[y][x])
-							dp[x][j] = dp[y][j - (1 << x)] + dis[y][x];
-						a2 = max(a2, dp[x][j]);
-						//							cout<<x<<' '<<y<<' '<<j<<' '<<dp[y][j-(1<<x)]<<' '<<dp[x][j]<<'\n';
-					}
-				}
-			}
-		} while (next_permutation(b, b + n));
-	}*/
-
-
 	a2 = dp[0][(1 << n) - 1];
 	if (a2%a1 == 0)
 		cout << a2 / a1 << '\n';
