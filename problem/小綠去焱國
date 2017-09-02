@@ -14,66 +14,74 @@
 #include<unordered_map>
 using namespace std;
 
+
+
 const int N = 20;
-int n, dis[N][N], dp[N][100000];
+int t, ti = 0, n, dis[N][N], dp[N][100000];
+
 void init(){
-	for (int i = 0; i < N; i++)
-		for (int j = 0; j < 100000; j++)
+	for (int i = 0; i<N; i++){
+		for (int j = 0; j<100000; j++){
 			dp[i][j] = 0;
+		}
+	}
 }
 int gcd(int a, int b){
-	return b?gcd(b, a%b) : a;
+	return b ? gcd(b, a%b) : a;
 }
 int main(){
-	cin >> n;
-	for (int i = 0; i < n; i++)
-		for (int j = i + 1; j < n; j++){
-			cin >> dis[i][j];
-			dis[j][i] = dis[i][j];
-		}
-	int a1, a2, a3;
-	for (int i = 1; i <= n; i++)
-		for (int s = 0; s < (1 << n); s++){
-			int c = 0, k = s;
-			while (k){
-				if (k & 1)c++; k >>= 1;
+	while (cin >> n){
+		init();
+		for (int i = 0; i < n; i++){
+			for (int j = i + 1; j < n; j++){
+				cin >> dis[i][j];
+				dis[j][i] = dis[i][j];
 			}
-			if (c != i)continue;
+		}
+		int a1, a2, a3;
+		for (int i = 1; i <= n; i++)
+			for (int s = 1; s <(1 << n); s++){
+				int c = 0, k = s;
+				while (k){
+					if (k & 1)c++; k >>= 1;
+				}
+				if (c != i)continue;
 
-			for (int x = 0; x < n; x++)
-				if (s&(1 << x)){
-					if (i == 1)dp[x][s] = dis[x][0];
-					for (int y = 0; y<n; y++)
-						if (x != y && (s&(1 << y))){
-							if (dp[x][s] == 0 || (dp[x][s] > dp[y][s ^ (1 << x)] + dis[x][y]))
-								dp[x][s] = dp[y][s ^ (1 << x)] + dis[x][y];
-						}
-				}
-		}
-		a1 = dp[0][(1 << n) - 1];
-	init();
-	for (int i = 1; i <= n; i++)
-		for (int s = (1<<n)-1; s >=0; s--){
-			int c = 0, k = s;
-			while (k){
-				if (k & 1)c++; k >>= 1;
+				for (int x = 0; x < n; x++)
+					if (s&(1 << x)){
+						if (i == 1)dp[x][s] = dis[x][0];
+						for (int y = 0; y<n; y++)
+							if (x != y && (s&(1 << y))){
+								if (dp[x][s] == 0 || (dp[x][s] > dp[y][s ^ (1 << x)] + dis[x][y]))
+									dp[x][s] = dp[y][s ^ (1 << x)] + dis[x][y];
+							}
+					}
 			}
-			if (c != i)continue;
-			for (int x = 0; x < n; x++)
-				if (s&(1 << x)){
-					if (i == 1)dp[x][s] = dis[x][0];
-					for (int y = 0; y < n; y++)
-						if (x != y && (s&(1 << y))){
-							if (dp[x][s] == 0 || dp[x][s] < dp[y][s ^ (1 << x)] + dis[y][x])
-								dp[x][s] = dp[y][s ^ (1 << x)] + dis[y][x];
-						}
+		a1 = dp[0][(1 << n) - 1];
+		init();
+		for (int i = 1; i <= n; i++)
+			for (int s = 1; s <(1<<n); s++){
+				int c = 0, k = s;
+				while (k){
+					if (k & 1)c++; k >>= 1;
 				}
+				if (c != i)continue;
+				for (int x = 0; x < n; x++)
+					if (s&(1 << x)){
+						if (i == 1)dp[x][s] = dis[0][x];
+						for (int y = 0; y < n; y++)
+							if (x != y && (s&(1 << y))){
+								if (dp[x][s] == 0 || dp[x][s] < dp[y][s ^ (1 << x)] + dis[y][x])
+									dp[x][s] = dp[y][s ^ (1 << x)] + dis[y][x];
+							}
+					}
+			}
+		a2 = dp[0][(1 << n) - 1];
+		if (a2%a1 == 0)
+			cout << a2 / a1 << '\n';
+		else{
+			a3 = gcd(a1, a2);
+			cout << a2 / a3 << '/' << a1 / a3 << '\n';
 		}
-	a2 = dp[0][(1 << n) - 1];
-	if (a2%a1 == 0)
-		cout << a2 / a1 << '\n';
-	else{
-		a3 = gcd(a1, a2);
-		cout << a2 / a3 << '/' << a1 / a3 << '\n';
 	}
 }
