@@ -1,0 +1,78 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+const int N = 1200;
+queue<int>q[N];
+int like[N][N], n;//j對i來說的排名
+int g[N], b[N];
+void cal(){
+	memset(g, 0, sizeof(g));
+	queue<int>single;
+	int last = -1;
+	for (int i = 1; i <= n; i++)single.push(i);
+	bool nm = 0;
+	while (!single.empty()){
+		int x = single.front(); single.pop();//取出單身女
+		int love = q[x].front(); q[x].pop();//取出女生最喜歡的男
+		if (!g[love]){//這男生 沒有女生配對
+
+			g[love] = x, b[x] = love;//男女配對
+			
+		}
+		else if (like[love][x] < like[love][g[love]]){//換人
+			single.push(g[love]);
+			g[love] = x;
+			b[x] = love;
+		}
+		else
+			single.push(x);
+	}
+	for (int i = 1; i <= n; i++)
+		printf("%d %d\n",i, b[i]);//先輸出男在輸出女  先1在0
+	/*
+	12   
+	12   21
+	21   12
+	21
+	*/
+	
+}
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int t;
+	cin >> t;
+	while (t--){
+		int m;
+		cin >> n;
+		for (int i = 1; i <= n; i++){
+			while (q[i].size())
+				q[i].pop();
+			for (int j = 1; j <= n; j++){
+				cin >> m;
+				q[i].push(m);//女喜歡男的排行 1喜歡0的排行 
+			}
+		}
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++){
+				cin >> m;
+				like[i][m] = j;//第i男 對於m女的喜歡程度排名為j
+			}
+		cal();
+	}
+}
