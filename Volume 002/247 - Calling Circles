@@ -1,0 +1,73 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+const int MAXN = 31;
+
+map<string, int> id;
+int  has[MAXN][MAXN];
+vector<string> son[MAXN];
+string name[31];
+bool vis[MAXN];
+int cnt;
+int getid(string s){
+	if (!id[s])
+		id[s] = id.size(),
+		name[++cnt]=s;
+	return id[s];
+}
+
+int main()
+{
+	int n, m, kase = 0;
+	while (cin >> n >> m ,n){
+		id.clear(); cnt = 0;
+		for (int i = 0; i <= n; ++i) son[i].clear();
+		memset(has, 0, sizeof has);
+		string s1, s2;
+		while (m--){
+			cin >> s1 >> s2;
+			int id1 = getid(s1), id2 = getid(s2);
+			has[id1][id2] = 1;
+		}
+		for (int k = 1; k <= n; ++k)
+			for (int i = 1; i <= n; ++i)
+				for (int j = 1; j <= n; ++j)
+					has[i][j] |= (has[i][k] & has[k][j]);
+		int ans = -1;
+		memset(vis, 0, sizeof vis);
+		for (int i = 1; i <= n; ++i){
+			if (!vis[i]){
+				vis[i] = 1;
+				son[++ans].push_back(name[i]);
+				for (int j = 1; j <= n; ++j){
+					if (vis[j]) continue;
+					if (has[i][j] && has[i][j] == has[j][i]){
+						son[ans].push_back(name[j]);
+						vis[j] = 1;
+					}
+				}
+			}
+		}
+		if (kase) cout << '\n';
+		cout << "Calling circles for data set " << ++kase << ":\n";
+		for (int i = 0; i <= ans; ++i){
+			for (int j = 0; j < son[i].size(); ++j){
+				if (j) cout << ", ";
+				cout << son[i][j];
+			}
+			cout << '\n';
+		}
+	}
+}
