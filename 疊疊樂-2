@@ -18,15 +18,15 @@ using namespace std;
 struct box {
 	int w, s;
 	int h;
-}p[100000];
+}p[10000];
 
 bool cmp(box a, box b) {
 	if (a.h == b.h)
 		return a.s - a.w > b.s - b.w;
 	return a.h > b.h;
 }
-int dp[100005] = {};
-int pos[100005][2] = {};
+int dp[10005] = {};
+int pos[10005][2] = {};
 int main() {
 	int n = 1;
 	while (cin >> p[n].w >> p[n].s >> p[n].h, p[n].w)
