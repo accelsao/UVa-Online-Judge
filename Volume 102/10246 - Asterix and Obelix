@@ -1,0 +1,72 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<cassert>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+struct host{
+	int c, n;
+	bool operator<(const host a)const{
+		return c < a.c;
+	}
+}cost[150];
+int d[150][150];
+int nn[15];
+int n, m, q;
+int main() {
+	int T = 0;
+	while (cin >> n >> m>>q, n) {
+		
+		for (int i = 1; i <= n; i++)
+			cin >> cost[i].c, cost[i].n = i;
+		sort(cost + 1, cost + n + 1);
+		int cc[150][150];
+		for (int i = 1; i <= n; i++)
+			nn[cost[i].n] = i;
+		for (int i = 1; i <= n; i++){
+			for (int j = 1; j <= n; j++)
+				d[i][j] = cc[i][j] = 1e9;
+			d[i][i] = 0;
+		}
+		int a, b, c;
+		for (int i = 0; i < m; i++) {
+			cin >> a >> b >> c;
+			a = nn[a];
+			b = nn[b];
+			d[a][b] = d[b][a] = min(c, d[a][b]);
+		}
+		
+		for (int k = 1; k <= n; k++)
+			for (int i = 1; i <= n; i++)
+				for (int j = 1; j <= n; j++){
+					d[i][j] = min(d[i][k] + d[k][j], d[i][j]);
+					if (d[i][j]== d[i][k] + d[k][j]){
+						int val = max(max(cost[i].c, cost[j].c), cost[k].c);
+						cc[i][j] = min(cc[i][j], d[i][j] + val);
+					}
+				}
+		
+		//pre 紀錄 i,j中點 也就是 i,k的第二點
+		if (T++)puts("");
+		printf("Case #%d\n", T);
+		for (int i = 0; i < q; i++){
+			cin >> a >> b;
+			a = nn[a];
+			b = nn[b];
+			if (cc[a][b] == 1e9)puts("-1");
+			else
+				printf("%d\n", cc[a][b]);				
+		}
+	}
+}
