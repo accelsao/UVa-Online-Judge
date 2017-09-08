@@ -1,0 +1,40 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<cassert>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+int d[101][101];
+int n, m;
+int main() {
+	int T = 1;
+	while (cin >> n >> m, n) {
+		for (int i = 1; i <= n; i++) 
+			for (int j = 1; j <= n; j++)
+				d[i][j] = 0;
+		int a, b, c;
+		for (int i = 0; i < m; i++) {
+			cin >> a >> b >> c;
+			d[a][b] = d[b][a] = c;
+		}
+		cin >> a >> b >> c;
+		for (int k = 1; k <= n; k++)
+			for (int i = 1; i <= n; i++)
+				for (int j = 1; j <= n; j++)
+					if (d[i][j] < min(d[i][k], d[k][j]))
+						d[i][j] = min(d[i][k], d[k][j]);
+		printf("Scenario #%d\n", T++);		
+		printf("Minimum Number of Trips = %d\n\n", int(ceil(c*1.0 / (d[a][b]-1))));	
+	}
+}
