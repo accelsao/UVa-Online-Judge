@@ -1,0 +1,91 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<cassert>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+struct edge{
+	int to, d;
+};
+int T = 1;
+int n, r, q;
+int a, b, c;
+vector<edge>g[101];
+void spfa(int s, int dis[]){
+	int v[101] = {};
+	queue<int>q;
+	for (int i = 0; i < n; i++)dis[i] = 1e9;
+	dis[s] = 0;
+	q.push(s);
+	while (!q.empty()){
+		int x = q.front(); q.pop();
+		v[x] = 0;
+		for (int i = 0; i < g[x].size(); i++){
+			edge e = g[x][i];
+			if (dis[e.to] > dis[x] + e.d){
+				dis[e.to] = dis[x] + e.d;
+				if (!v[e.to]){
+					v[e.to] = 1;
+					q.push(e.to);
+				}
+			}
+		}
+	}
+}
+struct E {
+	int node, g, h;
+	E(int a, int b, int c) :
+		node(a), g(b), h(c) {}
+	bool operator<(const E &a) const {
+		return g + h > a.g + a.h;
+	}
+};
+void sol(int s,int t,int k){
+	int h[101];
+	int cntk[101], kp[101];
+	spfa(t, h);
+	for (int i = 0; i < n; i++)
+		cntk[i] = 0, kp[i] = -1;
+	cntk[s] = 0, kp[s] = -1;
+	priority_queue<E, vector<E>>pq;
+	//E x(0, 0, 0);
+	pq.push(E(s, 0, h[s]));
+	while (!pq.empty()){
+		E x = pq.top(); pq.pop();
+		if (cntk[x.node] >= k || kp[x.node] == x.g + x.h)continue;
+		cntk[x.node]++, kp[x.node] = x.g + x.h;
+		if (x.node == t&&cntk[x.node] == k){
+			printf("%d\n", x.g); return;
+		}
+		for (int i = 0; i < g[x.node].size(); i++)
+			pq.push(E(g[x.node][i].to, x.g + g[x.node][i].d, h[g[x.node][i].to]));
+	}
+	puts("?");
+}
+int main(){
+	while (cin >> n >> r){
+		for (int i = 0; i < n; i++)g[i].clear();
+		for (int i = 0; i < r; i++)
+			cin >> a >> b >> c,
+			g[a].push_back(edge{ b, c }),
+			g[b].push_back(edge{ a, c });
+		printf("Set #%d\n", T++);
+		cin >> q;
+		while (q--){
+			cin >> a >> b;
+			sol(a, b, 2);
+		}
+	}
+
+}
