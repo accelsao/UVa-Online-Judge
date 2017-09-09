@@ -45,6 +45,7 @@ void spfa(int s, int dis[]){
 }
 struct E {
 	int node, g, h;
+	//g 目前節點路徑長 h i->t的最短路徑
 	E(int a, int b, int c) :
 		node(a), g(b), h(c) {}
 	bool operator<(const E &a) const {
@@ -53,13 +54,11 @@ struct E {
 };
 void sol(int s,int t,int k){
 	int h[101];
-	int cntk[101], kp[101];
+	int cntk[101], kp[101];//第k路徑
 	spfa(t, h);
 	for (int i = 0; i < n; i++)
 		cntk[i] = 0, kp[i] = -1;
-	cntk[s] = 0, kp[s] = -1;
 	priority_queue<E, vector<E>>pq;
-	//E x(0, 0, 0);
 	pq.push(E(s, 0, h[s]));
 	while (!pq.empty()){
 		E x = pq.top(); pq.pop();
