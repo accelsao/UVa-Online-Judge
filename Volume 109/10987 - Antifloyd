@@ -1,0 +1,61 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+int n;
+int d[150][150];
+int g[150][150];
+void floyd(){
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			g[i][j] = 1;
+	for (int k = 0; k < n; k++)
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++){
+				if (d[i][k] + d[k][j] < d[i][j]){//發現更加路徑
+					puts("Need better measurements.");
+					return;
+				}
+				if (i == j || j == k || k == i)continue;
+				if (d[i][k] + d[k][j] == d[i][j])//是最佳路徑
+					g[i][j] = 0;
+			}
+	int e = 0;
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < i; j++)
+			e += i != j ? g[i][j] : 0;
+	printf("%d\n", e);
+	for (int i = 0; i < n; i++)
+		for (int j = i + 1; j < n; j++)
+			if (g[i][j])
+				printf("%d %d %d\n", i + 1, j + 1, d[i][j]);
+}
+int main(){
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t;i++){
+		cin >> n;
+		for (int i = 0; i < n; i++){
+			for (int j = 0; j < i; j++)
+				cin >> d[i][j],
+				d[j][i] = d[i][j];
+			d[i][i] = 0;
+		}
+		printf("Case #%d:\n", i);
+		floyd();
+		puts("");
+	}
+}
