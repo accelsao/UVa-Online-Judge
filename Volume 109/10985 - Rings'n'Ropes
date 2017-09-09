@@ -1,0 +1,64 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+int d[150][150];
+int s[150];
+int n, m;
+void floyd(){
+	for (int k = 0; k < n; k++)
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++)
+				if (d[i][k] + d[k][j] < d[i][j])
+					d[i][j] = d[i][k] + d[k][j];
+}
+int main(){
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t;i++){
+		cin >> n >> m;
+		for (int i = 0; i < n; i++){
+			for (int j = 0; j < n; j++)
+				d[i][j] = 1e9;
+			d[i][i] = 0;
+		}
+		int a, b;
+		while (m--){
+			cin >> a >> b;
+			d[a][b] = d[b][a] = 1;
+		}
+		floyd();
+		int ans = 0;
+		for (int i = 0; i< n; i++)
+			for (int j = i + 1; j < n;j++)
+				if (d[i][j] != 1e9){
+					int cnt = 0;
+					for (int k = 0; k < n; k++)
+						if (d[i][j] == d[i][k] + d[k][j])
+							s[cnt++] = k;
+					int count = 0;
+					for (int l = 0; l < cnt; l++)
+						for (int r = l + 1; r < cnt; r++){
+							int t1 = s[l], t2 = s[r];
+							//從起點到兩點距離若相等 則會垂直 
+							if (d[t1][t2] == 1 && d[i][t1] != d[i][t2])
+								count++;
+						}
+					ans = max(ans, count);
+				}
+		printf("Case #%d: %d\n", i, ans);
+	}
+}
