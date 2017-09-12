@@ -1,0 +1,93 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+struct Node {
+	int x, y, d, nxt;
+}edge[500001];
+int e, head[1200], pre[1200], rec[1200];
+void add(int x, int y, int d) {
+	edge[e].x = x, edge[e].y = y, edge[e].d = d;
+	edge[e].nxt = head[x], head[x] = e++;
+	edge[e].x = y, edge[e].y = x, edge[e].d = 0;
+	edge[e].nxt = head[y], head[y] = e++;
+}
+int mf(int s, int t) {
+	int flow = 0;
+	while (1) {
+		int dis[1200] = {};
+		dis[s] = 1e9;
+		queue<int>q;
+		q.push(s);
+		while (!q.empty()) {
+			int x = q.front(); q.pop();
+			for (int i = head[x]; i != -1; i = edge[i].nxt) {
+				int y = edge[i].y;
+				if (!dis[y] && edge[i].d > 0) {
+					pre[y] = x,rec[y]=i;
+					dis[y] = min(dis[x], edge[i].d);
+					q.push(y);
+				}
+			}
+			if (dis[t])break;
+		}
+		if (!dis[t])break;
+		flow += dis[t];
+		for (int x = t; x != s; x = pre[x]) {
+			int r = rec[x];
+			edge[r].d -= dis[t];
+			edge[r ^ 1].d += dis[t];
+		}
+	}
+	return flow;
+}
+int n,m;
+int main() {
+	while (cin >> n >> m, n) {
+		e = 0;
+		memset(head, -1, sizeof(head));
+		int s = 0, t = n + m + 1;
+		int tot = 0, x, y;
+		for (int i = 1; i <= n; i++) {
+			cin >> x; add(m + i, t, x);
+			tot += x;
+		}
+		for (int i = 1; i <= m; i++) {
+			cin >> x;
+			while (x--) {
+				cin >> y;
+				add(i, m + y, 1);
+			}
+			add(s, i, 1);
+		}
+		int flow = mf(s, t);
+		if (flow != tot) 
+			puts("0");
+		else {
+			puts("1");
+			vector<int>ans[20];
+			for (int i = 1; i <= m; i++)
+				for (int j = head[i]; j != -1; j = edge[j].nxt)
+					if (!edge[j].d&&edge[j].y > m) {
+						ans[edge[j].y - m - 1].push_back(i); break;
+					}
+			for (int i = 0; i < n; i++, puts(""))
+				for (int j = 0; j < ans[i].size(); j++) {
+					if (j)putchar(' ');
+					printf("%d", ans[i][j]);
+				}
+		}
+	}
+}
