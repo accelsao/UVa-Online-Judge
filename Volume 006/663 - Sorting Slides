@@ -58,7 +58,7 @@ int main() {
 		printf("Heap %d\n", t++);
 		bool ok = 0;
 		for(int i=0;i<n;i++)
-			if (bipartite(n, i, s[i]) < ans) {//檢查唯一性
+			if (bipartite(n, i, s[i]) < ans) {//檢查唯一性  禁用i,s[i]後 最大匹配更小 是解
 				if (ok)putchar(' ');
 				printf("(%c,%d)", (i + 'A'), s[i] + 1);
 				ok = 1;
