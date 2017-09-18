@@ -53,7 +53,7 @@ int main() {
 						pos[j][1] = p[i].h;
 						break;
 					}
-					if (dp[j - 1] == p[i].w) {
+					if (i==n-1&&dp[j - 1] == p[i].w) {
 						dp[j] = k;
 						pos[j][1] = p[i].h;
 						break;
