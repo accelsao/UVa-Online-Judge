@@ -1,0 +1,80 @@
+#include<iostream>
+#include<algorithm>
+#include<map>
+#include<string>
+#include<cstdio>
+#include<queue>
+#include<cmath>
+#include<stack>
+#include<cctype>
+#include<sstream>
+using namespace std;
+
+struct combo{
+	int m[20];
+	int price;
+}c[20];
+int n;
+
+//s 數量 t第幾項
+bool check(int s, int t){
+	bool res = 1;
+	int k = n - 1;
+	for (int i = 0; i < n; i++){
+		if (c[t].m[k] > s % 10)
+			return 0;
+		k--, s /= 10;
+	}
+	return 1;
+}
+//999999+1
+//題目最多6個東西 一個東西上限9  因此每個所需以int表示 最大 999999
+int dp[1000001] = {};
+int main(){
+	while (cin >> n){
+		//歸零
+		for (int i = 0; i < 20; i++){
+			for (int j = 0; j < 20; j++)
+				c[i].m[j] = 0;
+			c[i].price = 0;
+		}
+
+		for (int i = 0; i < n; i++){
+			c[i].m[i] = 1;
+			cin >> c[i].price;
+		}
+		int m;
+		cin >> m;
+		for (int i = n; i <n + m; i++){
+			for (int j = 0; j < n; j++)
+				cin >> c[i].m[j];
+			cin >> c[i].price;
+		}
+		int top = 1;//上限
+		for (int i = 0; i < n; i++)top *= 10;
+
+		for (int i = 1; i <= top; i++)
+			dp[i] = 1e9;
+		dp[0] = 0;
+		for (int i = 0; i < n + m; i++)
+			for (int j = 1; j <= top; j++)
+				if (check(j, i)){//可以買
+					int prev = j;
+					for (int k = n - 1, q = 1; k >= 0; k--, q *= 10)
+						prev -= c[i].m[k] * q;
+					dp[j] = min(dp[j], dp[prev] + c[i].price);
+				}
+
+
+		int t;
+		cin >> t;
+		for (int i = 0; i < t; i++){
+			int ans = 0, tmp;
+			for (int j = 0; j < n; j++){
+				cin >> tmp;
+				ans = ans * 10 + tmp;
+			}
+			cout << dp[ans] << endl;
+		}
+	}
+}
