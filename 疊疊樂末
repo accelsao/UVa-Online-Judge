@@ -1,0 +1,103 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<vector>
+#include<cstring>
+using namespace std;
+
+struct box {
+	int w, s;
+	int h;
+}p[10000];
+
+bool cmp(box a, box b) {
+	if (a.h == b.h)
+		return a.s - a.w > b.s - b.w;
+	return a.h > b.h;
+}
+int dp[10][10005] = {};
+int pos[10][10005][2] = {};
+int main() {
+
+	/*FILE*s;
+	freopen_s(&s, "c261_09.in.txt", "w", stdout);
+	int n = 486;
+	for (int i = 1; i <= n; i++) {
+		srand(i*i+i*2+22);
+		p[i].w = rand() %6666 + 1;
+		p[i].s = min(p[i].w + rand() % 6666, rand() % 6666 + 1);
+		p[i].h = rand() % 9 + 1;
+		printf("%d %d %d\n", p[i].w, p[i].s, p[i].h);
+	}
+	puts("0 0 0");
+	*/
+
+
+
+	//FILE*s;
+	//freopen_s(&s, "c261_09.out.txt","w",stdout);
+	int n = 1;
+	while (cin >> p[n].w >> p[n].s >> p[n].h, p[n].w)
+		n++;
+	sort(p + 1, p + n, cmp);
+	for (int i = 1; i < 10; ++i) {
+		for (int j = 1; j < n; j++)
+			dp[i][j] = -1;
+		dp[i][0] = 1e9;
+	}
+	//dp 負重
+	int Max[10] = {};
+	for (int i = 1; i < 10; i++)Max[i] = 0;
+	p[0].h = 1e9;
+	for (int i = 1; i < 10; i++)
+		for (int j = 0; j < 2; j++)
+			pos[i][0][j] = 1e9;
+	for (int i = 1; i < n; ++i) {
+		for (int k = 9; k >= p[i].h; k--) {
+			if (dp[k][Max[k]] >= p[i].w) {
+				Max[k]++;
+				for (int d = Max[k]; d >= 1; d--)
+					if (pos[k][d][1] <= pos[k][d - 1][1])
+						pos[k][d][0] = pos[k][d][1];
+					else break;
+					//for (int i = 0; i <= Max[k]; i++)pos[k][i][0] = pos[k][i][1];
+			}
+			for (int j = Max[k]; j >= 1; j--) {
+				if (p[i].h <= pos[k][j - 1][1])
+					if (dp[k][j - 1] >= p[i].w) {
+						int ks = min(dp[k][j - 1] - p[i].w, p[i].s - p[i].w);
+						if (dp[k][j] < ks) {
+							
+							dp[k][j] = ks;
+							pos[k][j][1] = p[i].h;
+							if(j==Max[k])
+								for (int d = Max[k]; d >= 1; d--)
+								if (pos[k][d][1] <= pos[k][d - 1][1])
+									pos[k][d][0] = pos[k][d][1];
+								else break;
+							break;
+						}
+					}
+			}
+		}
+	}
+	for (int i = 1; i <= 9; i++)
+		pos[i][Max[i]][0] = pos[i][Max[i]][1];
+
+	int ans = -1, p = 0;
+	for (int i = 9; i >= 1; i--)
+		if (Max[i] > ans)ans = Max[i], p = i;
+	printf("%d\n", ans);
+	int L = pos[p][1][0] * 2 - 1;//pos[] max 10
+	for (int i = ans; i >= 1; i--) {
+		int cc = (L - (pos[p][i][0] * 2 - 1)) / 2;
+		while (cc--)putchar(' ');
+		for (int j = 0; j < pos[p][i][0]; j++) {
+			if (j)putchar(' ');
+			putchar('*');
+		}
+		cc = (L - (pos[p][i][0] * 2 - 1)) / 2;
+		while (cc--)putchar(' ');
+		puts("");
+	}
+}
