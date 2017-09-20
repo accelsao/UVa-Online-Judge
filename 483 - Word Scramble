@@ -1,0 +1,28 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<sstream>
+#include<vector>
+using namespace std;
+
+string s;
+stringstream ss;
+int main(){
+	while (getline(cin, s)) {
+		ss.clear();
+		ss << s;
+		string t;
+		bool sp = 0;
+		while (ss >> t) {
+			if (sp++)putchar(' ');
+			for (int i = t.size() - 1; i >= 0; i--)
+				cout << t[i];	
+		}
+		puts("");
+	}
+}
