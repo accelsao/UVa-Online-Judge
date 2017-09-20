@@ -1,0 +1,46 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<cstdlib>
+#include<queue>
+#include<string>
+#include<vector>
+using namespace std;
+
+vector<int>g[201];
+int p[201];
+bool bfs(){
+	queue<int>q;
+	q.push(0);
+	p[0] = 1;
+	while (!q.empty()) {
+		int x = q.front(); q.pop();
+		for (int i = 0; i < g[x].size(); i++)
+			if (!p[g[x][i]])
+				p[g[x][i]] = p[x] == 1 ? 2 : 1,q.push(g[x][i]);
+			else if (p[g[x][i]] == p[x])
+				return 0;
+	}
+	return 1;
+}
+int main() {
+	ios::sync_with_stdio(0); cin.tie(0);
+	int n,m;
+	while (cin >> n >> m,n) {
+		int a, b;
+		for (int i = 0; i < n; i++)
+			g[i].clear(), p[i] = 0;
+		for (int i = 0; i < m; i++) {
+			cin >> a >> b;
+			g[a].push_back(b);
+			g[b].push_back(a);
+		}
+		if (bfs())
+			puts("BICOLORABLE.");
+		else
+			puts("NOT BICOLORABLE.");
+	}
+	
+}
