@@ -1,0 +1,65 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<cassert>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+vector<int>g[101];
+int n, m;
+int low[101], vis[101];
+int t = 0;
+string k[101];
+set<string>ans;
+void dfs(int p, int i) {
+	vis[i] = low[i] = ++t;
+	int c = 0;
+	for (int j : g[i]) 
+		if (!vis[j]) {
+			c++;
+			dfs(i, j);
+			low[i] = min(low[i], low[j]);
+			if ((low[j] >= vis[i] && p != -1) || (p == -1 && c > 1))
+				ans.insert(k[i]);
+			//y的所有子樹包含自己的最高祖先還比i低 代表i是關節點
+			//low 的意義是：不斷往下走 tree edge ，最後走一次 back edge ，所能觸及的最高祖先。
+		}
+		else if (j != p)
+			low[i] = min(low[i], vis[j]);
+}
+int main() {
+	int dd = 1;
+	while (cin >> n, n) {
+		t = 0;
+		ans.clear();
+		string s;
+		map<string, int>R;
+		for (int i = 0; i < n; i++)
+			cin >> s, R[s] = i, k[i] = s, g[i].clear(), low[i] = vis[i] = 0;
+		cin >> m;
+		string a, b;
+		while (m--) {
+			cin >> a >> b;
+			g[R[a]].push_back(R[b]);
+			g[R[b]].push_back(R[a]);
+		}
+		for (int i = 0; i < n; i++)
+			if (!vis[i])
+				dfs(-1, i);
+		if (dd != 1)puts("");
+		printf("City map #%d: %d camera(s) found\n",dd++,ans.size());
+		set<string>::iterator x;
+		for (x = ans.begin(); x != ans.end(); x++)
+			cout << *x << endl;
+	}
+}
