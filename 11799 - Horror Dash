@@ -8,7 +8,7 @@ int main() {
 			cin >> n;
 			int s = 0, m;
 			while (n--)cin >> m, s = max(s, m);
-			printf("Case %d: %d\n", t, s);
+			printf("Case %d: %d\n", i, s);
 		}
 	}
 }
