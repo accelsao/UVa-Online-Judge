@@ -1,0 +1,89 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+#define LL long long 
+struct edge{
+	int u, v;
+	int cap, flow;
+	LL cost;
+};
+vector<int>g[101];
+vector<edge>E;
+int n, m, k;
+int s, t;
+void init(){
+	for (int i = 0; i <= n; i++)g[i].clear();
+	E.clear();
+}
+void add(int x, int y, int cap, int flow, LL cost){
+	E.push_back(edge{ x, y, cap, flow, cost });
+	E.push_back(edge{ y, x, 0, flow, -cost });
+	int m = E.size();
+	g[x].push_back(m - 2), g[y].push_back(m - 1);
+}
+int d[101], inq[101], a[101],pre[101];
+int BF(int s, int t, LL &flow,LL &cost){
+	queue<int>q;
+	q.push(s);
+	for (int i = 0; i <= n; i++)d[i] = 1e9, a[i] = pre[i] = inq[i] = 0;
+	d[s] = pre[s] = 0; a[s] = 1e9;
+	while (!q.empty()){
+		int u = q.front(); q.pop();
+		inq[u] = 0;
+		for (int i = 0; i < g[u].size(); i++){
+			edge &e = E[g[u][i]];
+			if (e.flow<e.cap&&d[e.v]>d[e.u] + e.cost){
+				d[e.v] = d[e.u] + e.cost;
+				a[e.v] = min(a[e.u], e.cap - e.flow);
+				pre[e.v] = g[u][i];
+				if (!inq[e.v]){
+					inq[e.v] = 1;
+					q.push(e.v);
+				}
+			}
+		}
+	}
+	if (d[t] == 1e9)return 0;
+	flow += a[t];//a[]剩餘容量
+	cost += (LL)d[t] * (LL)a[t];//d[]最小成本
+	for (int u = t; u != s; u = E[pre[u]].u){
+		E[pre[u]].flow += a[t];
+		E[pre[u] ^ 1].flow -= a[t];
+	}
+	return 1;
+}
+int MF(int s, int t, LL &cost){
+	LL flow = 0;
+	cost = 0;
+	while (BF(s, t, flow, cost));
+	return flow;
+}
+int main(){
+	while (cin >> n >> m >> k){
+		init();
+		int x, y;
+		LL a,c;
+		while (m--){
+			cin >> x >> y >> a >> c;
+			for (int i = 1; i <= c; i++)
+				add(x, y, 1, 0 ,a*(i*i - (i - 1)*(i - 1)));
+		}
+		add(0, 1, k, 0, 0);
+		s = 0, t = n;
+		if (MF(s, t, c) != k)puts("-1");
+		else printf("%lld\n", c);
+	}
+}
