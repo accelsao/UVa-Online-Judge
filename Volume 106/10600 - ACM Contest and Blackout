@@ -1,0 +1,58 @@
+#include <iostream>
+#include <algorithm>
+#include<vector>
+#include<cstring>
+#include<queue>
+#include<cmath>
+using namespace std;
+
+
+struct edge {
+	int x, y, d;
+	bool c;
+	bool operator<(const edge &a)const {return d < a.d;}
+}E[10001];
+int p[101];
+int t, n, m;
+int find(int x) {
+	return x == p[x] ? x : p[x] = find(p[x]);
+}
+int main() {
+	cin >> t;
+	while (t--) {
+		cin >> n >> m;
+		for (int i = 0; i < m; i++) {
+			cin >> E[i].x >> E[i].y >> E[i].d;
+			E[i].c = 0;
+		}
+		sort(E, E + m);
+		int cost = 0;
+		for (int i = 0; i <= n; i++)
+			p[i] = i;
+		queue<int>q;
+		for (int i = 0; i < m; i++) {
+			int x = find(E[i].x), y = find(E[i].y);
+			if (x != y)
+				p[x] = y, cost += E[i].d, q.push(i);
+		}
+		printf("%d ", cost);
+		int mc = 1e9;
+		while (!q.empty()) {
+			int s = q.front(); q.pop();
+			cost = 0;
+			E[s].c = 1;
+			for (int i = 0; i <= n; i++)
+				p[i] = i;
+			int g = 0;//邊
+			for (int j = 0; j < m; j++) {
+				int x = find(E[j].x), y = find(E[j].y);
+				if (!E[j].c&&x != y)
+					p[x] = y, cost += E[j].d, g++;
+			}
+			if (g == n - 1)//邊有n-1個 都有連到
+				mc = min(mc, cost);
+			E[s].c = 0;
+		}
+		printf("%d\n", mc);
+	}
+}
