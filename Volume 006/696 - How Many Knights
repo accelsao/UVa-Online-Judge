@@ -1,0 +1,20 @@
+#include <iostream>
+#include <algorithm>
+#include<vector>
+#include<cstring>
+#include<queue>
+#include<cmath>
+using namespace std;
+
+int n, m;
+int main() {
+	while (cin >> n >> m, n+m) {
+		if (min(n, m) == 1)
+			printf("%d ", max(n, m));
+		else if (min(n, m) == 2)
+			printf("%d ", max(n, m) / 4 * 4 + (max(n, m) % 4 < 3 ? max(n, m) % 4 : 2)*2);
+		else
+			printf("%d ", (n*m + 1) / 2);
+		printf("knights may be placed on a %d row %d column board.\n", n, m);
+	}
+}
