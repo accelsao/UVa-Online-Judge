@@ -1,0 +1,21 @@
+#include <iostream>
+#include <algorithm>
+#include<vector>
+#include<cstring>
+#include<queue>
+#include<cmath>
+using namespace std;
+
+
+#define PI 4 * atan(1)
+int x, y, a, b, k;
+int main() {
+	while (cin >> x>>y >> a >> b >> k,x+y+a+b+k) {
+		double r = sqrt((x - a)*(x - a) + (y - b)*(y - b));
+		double c = 2 * PI / k;
+		r /= 2;
+		if (k & 1) 
+			r = r / sin(k / 2 / 2.0/k * 2 * PI );
+		printf("%.6lf\n", r*r*sin(2 * PI / k)*k / 2);
+	}
+}
