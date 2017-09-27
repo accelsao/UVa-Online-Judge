@@ -1,0 +1,46 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+int t;
+struct d {
+	double x, y;
+};
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	while (cin >> t&& t) {
+		double rs;
+		double tot = 0;
+		for (int i = 0; i < t; i++) {
+			cin >> rs;
+			double s = 0;
+			vector<d>v;
+			double a, b;
+			cin >> a >> b;
+			v.push_back(d{ a, b });
+			while (cin >> a >> b) {
+				v.push_back(d{ a, b });
+				if (fabs(a - v[0].x) < 1e-6&&fabs(b - v[0].y) < 1e-6)break;
+			}
+			for (int i = 0; i < v.size()-1; i++)
+				s += v[i].x*v[i + 1].y - v[i].y*v[i + 1].x;
+			tot += fabs(s) / 2.0*rs;
+		}
+		double r, t;
+		cin >> r >> t;
+		printf("%d\n", int(tot / (r*r*acos(-1)*t)));
+	}
+}
