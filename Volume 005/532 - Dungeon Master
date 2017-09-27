@@ -1,0 +1,65 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+struct pp {
+	int l, r, c;
+};
+int l, r, c;
+char p[31][31][31];
+int v[31][31][31];
+int sx, sy,sl;
+const int w[6][3] = { {0,0,1},{0,1,0},{0,0,-1},{0,-1,0},{-1,0,0},{1,0,0} };
+int ans;
+int bfs() {
+	queue<pp>q;
+	q.push(pp{ sl,sx,sy });
+	v[sl][sx][sy] = 0;
+	p[sl][sx][sy] = '#';
+	while (!q.empty()) {
+		int ll = q.front().l, rr = q.front().r, cc = q.front().c;
+		q.pop();
+		for (int k = 0; k < 6; k++) {
+			int d = ll + w[k][0];
+			int a = rr + w[k][1];
+			int b = cc + w[k][2];
+			if (d < 0 || a < 0 || b < 0 || d >= l || a >= r || b >= c)continue;
+			if (p[d][a][b] != '#') {
+				v[d][a][b] = v[ll][rr][cc] + 1;
+				if (p[d][a][b] == 'E')
+					return v[d][a][b];
+				p[d][a][b] = '#';
+				q.push(pp{ d,a,b });
+			}
+		}
+	}
+	return 0;
+}
+int main() {
+	while (cin >> l >> r >> c, l + r + c) {
+		for (int k = 0; k < l; k++)
+			for (int i = 0; i < r; i++)
+				for (int j = 0; j < c; j++) {
+					cin >> p[k][i][j];
+					if (p[k][i][j] == 'S')
+						sx = i, sy = j, sl = k;
+				}
+		int ans=bfs();
+		if (ans)
+			printf("Escaped in %d minute(s).\n", ans);
+		else
+			puts("Trapped!");
+	}
+}
