@@ -105,3 +105,16 @@ int main() {
 		}
 	}
 }
+---------------------------------
+( (grid width odd) && (#inversions even) )  ||  ( (grid width even) && ((blank on odd row from bottom) == (#inversions even)) )
+
+If the grid width is odd, then the number of inversions in a solvable situation is even.
+If the grid width is even, and the blank is on an even row counting from the bottom (second-last, fourth-last etc), then the number of inversions in a solvable situation is odd.
+If the grid width is even, and the blank is on an odd row counting from the bottom (last, third-last, fifth-last etc) then the number of inversions in a solvable situation is even.
+
+
+THEOREM 1.1a: If n is odd, then every legal configuration corresponds to a C[] permutation with an even number of inversions.
+
+THEOREM 1.1b: If n is even, then every legal configuration with the hole in row i where m - i is even corresponds to a C[] permutation with an even number of inversions. 
+
+THEOREM 1.1c: If n is even, then every legal configuration with the hole in row i where m - i is odd corresponds to a C[] permutation with an odd number of inversions.
