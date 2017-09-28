@@ -1,0 +1,107 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+const int dr[4] = { 0, 0, +1, -1 };
+const int dc[4] = { +1, -1, 0, 0 };
+const int dir[4] = { 'R', 'L', 'D', 'U' };
+const int INF = 0x3f3f3f3f;
+const int FOUND = -1;
+int p[15][15];
+int t;
+vector<char> path;
+int Er, Ec;
+int H() {
+	int h = 0;
+	for (int r = 0; r < 4; r++) {
+		for (int c = 0; c < 4; c++) {
+			if (!p[r][c]) continue;
+			int expect_r = (p[r][c] - 1) / 4;
+			int expect_c = (p[r][c] - 1) % 4;
+			h += abs(expect_r - r) + abs(expect_c - c);
+		}
+	}
+	return h;
+	//估價 與最終位置的差距
+}
+int dfs(int g, int pdir, int bound) {
+	int h = H();
+	int f = g + h;
+	if (f > bound) return f;
+	if (h == 0) return FOUND;
+	int mn = INF;
+	for (int i = 0; i < 4; i++) {
+		if (i == (pdir ^ 1)) continue;//如果pdir跟上一個反邊 左右,上下的反邊避免迴圈
+		int nr = Er + dr[i];
+		int nc = Ec + dc[i];
+		if (nr < 0 || nr >= 4) continue;
+		if (nc < 0 || nc >= 4) continue;
+		path.push_back(dir[i]);
+		swap(p[nr][nc], p[Er][Ec]);
+		swap(nr, Er); swap(nc, Ec);
+		int t = dfs(g + 1, i, bound);
+		if (t == FOUND) return FOUND;
+		if (t < mn) mn = t;
+		swap(nr, Er); swap(nc, Ec);
+		swap(p[nr][nc], p[Er][Ec]);
+		path.pop_back();
+	}
+	return mn;
+}
+bool IDAstar() {
+	int bound = H();
+	for (;;) {
+		int t = dfs(0, -1, bound);
+		if (t == FOUND) return true;
+		if (t == INF) return false;
+		// 下次要搜的 bound >= 50，真的解也一定 >= 50，剪枝
+		if (t >= 50) return false;
+		bound = t;
+	}
+	return false;
+}
+
+bool solvable() {
+	int cnt = 0;
+	bool occur[16] = { false };
+	for (int r = 0; r < 4; r++) 
+		for (int c = 0; c < 4; c++) {
+			if (!p[r][c]) {
+				Er = r;
+				Ec = c;
+			}
+			else {
+				cnt += count(occur + 1, occur + p[r][c], false);
+				occur[p[r][c]] = true;
+			}
+		}
+	return (cnt + (Er + 1)) % 2 == 0;
+}
+int main() {
+	cin >> t;
+	while (t--) {
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++) 
+				cin >> p[i][j];
+		path.clear();
+		if (!solvable() || !IDAstar()) 
+			puts("This puzzle is not solvable.");
+		else {
+			for (char c : path) 
+				printf("%c", c);
+			puts("");
+		}
+	}
+}
