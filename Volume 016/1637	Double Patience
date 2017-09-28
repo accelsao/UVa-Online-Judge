@@ -57,3 +57,58 @@ int main(){
 	
 	}
 }
+----------------------------------------------------------------------------------
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+map<vector<int>, double> d;
+vector<char>q[9];
+double dp(vector<int> cnt, int c) {
+	if (c == 0) return 1;
+	if (d.count(cnt)) return d[cnt];
+	double sum = 0;
+	int tot = 0;
+	for (int i = 0; i<9; i++) 
+		if (cnt[i])
+		for (int j = i + 1; j<9; j++) 
+			if (cnt[j]&& q[i][cnt[i] - 1] == q[j][cnt[j] - 1]){
+				tot++;
+				cnt[i]--; cnt[j]--;
+				sum += dp(cnt, c - 2);
+				cnt[i]++; cnt[j]++;
+			}
+	if (!tot) return d[cnt] = 0;
+	return d[cnt] = sum / tot;
+}
+int main() {
+	string s;
+	while (cin>>s) {
+		for (int i = 0; i < 9; i++)q[i].clear();
+		q[0].push_back(s[0]);
+		for (int i = 0; i < 3; i++)
+			cin >> s, q[0].push_back(s[0]);
+		for (int i = 1; i < 9; i++)
+			for (int j = 0; j < 4; j++) {
+				cin >> s;
+				q[i].push_back(s[0]);
+			}
+		vector<int> cnt(9, 4);
+		d.clear();
+		printf("%lf\n", dp(cnt, 36));
+	}
+}
