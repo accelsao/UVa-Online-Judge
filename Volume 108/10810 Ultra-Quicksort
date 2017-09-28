@@ -1,0 +1,54 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+int p[500001];
+int t[500001];//暫存
+long long ans;
+void comb(int l, int m, int r) {
+	int lc = l, rc = m + 1, x = 0;
+	while (lc <= m&&rc <= r) {
+		if (p[rc] < p[lc]) {
+			t[x++] = p[rc++];
+			ans += m - lc + 1;//要搬動的距離 搬到lc左邊 共m-lc+1
+		}
+		else
+			t[x++] = p[lc++];
+	}
+	while (lc <= m)t[x++] = p[lc++];
+	while (rc <= r)t[x++] = p[rc++];
+	x = 0;
+	for (int i = l; i <= r; i++)
+		p[i] = t[x++];
+}
+void merge_s(int l,int r) {
+	if (l == r)return;
+	int m = (l + r) / 2;
+	merge_s(l, m);
+	merge_s(m+1, r);
+	comb(l, m, r);
+}
+int main() {
+	int n;
+	while (cin >> n, n) {
+		ans = 0;
+		for (int i = 0; i < n; i++)
+			cin >> p[i];
+		merge_s(0, n - 1);
+		printf("%lld\n", ans);
+	}
+}	
