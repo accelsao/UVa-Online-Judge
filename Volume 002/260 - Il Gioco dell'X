@@ -1,0 +1,49 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+char p[201][201];
+const int d[][2] = { { -1,-1 },{ -1,0 },{ 0,-1 },{ 0,1 },{ 1,0 },{ 1,1 } };
+int n, w;
+void dfs(int i,int j,char c) {
+	p[i][j] = '.';
+	if (c == 'w'&&j == n - 1)w = 2;
+	else if (c == 'b'&&i == n - 1)w = 1;
+	for (int k = 0; k < 6; k++) {
+		int x = i + d[k][0];
+		int y = j + d[k][1];
+		if (x < 0 || y < 0 || x >= n || y >= n)continue;
+		if (p[x][y] == c)
+			dfs(x, y, c);
+	}
+}
+int main() {
+	int s = 1;
+	while (cin >> n, n) {
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++)
+				cin >> p[i][j];
+		 w = 0;
+		for (int i = 0; i < n; i++)
+			if (p[i][0] == 'w')
+				dfs(i, 0, 'w');
+		for (int i = 0; i < n; i++)
+			if (p[0][i] == 'b')
+				dfs(0, i, 'b');
+		if (w == 1)printf("%d B\n", s++);
+		else printf("%d W\n", s++);
+	}
+}
