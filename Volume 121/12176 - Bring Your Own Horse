@@ -1,0 +1,115 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+struct edge{
+	int x, y, v;
+	edge(int a=0, int b=0, int c=0) :
+		x(a), y(b), v(c){}
+	bool operator<(const edge &a)const{
+		return v < a.v;
+	}
+};
+edge D[100001];
+vector<edge>E[3001];
+int p[3001];
+int find(int x){
+	return x == p[x] ? x : p[x] = find(p[x]);
+}
+int n, m;
+void kruscal(){
+	sort(D, D + m);
+	for (int i = 0; i <= n; i++){
+		p[i] = i; E[i].clear();
+	}
+	for (int i = 0; i < m; i++){
+		int x = find(D[i].x);
+		int y = find(D[i].y);
+		if (x != y){
+			E[D[i].x].push_back(edge(D[i].x, D[i].y, D[i].v));
+			E[D[i].y].push_back(edge(D[i].y, D[i].x, D[i].v));
+			p[x] = y;
+		}
+	}
+}
+int dp[4096][20], dpw[4096][20];
+int treelevel[4096], treepath[4096];
+void dfs(int u, int p, int level){
+	treelevel[u] = level, treepath[level] = u;
+	//dp[a][0]節點a 上1祖先 [a][1]上2祖先...
+	for (int i = 1; (1 << i) < level; i++){
+		dp[u][i] = max(dp[u][i - 1], dp[dpw[u][i - 1]][i - 1]);
+		dpw[u][i] = treepath[level - (1 << i)];
+	}
+	for (int i = 0; i < E[u].size(); i++){
+		int v = E[u][i].y;
+		if (v == p)continue;
+		dp[v][0] = E[u][i].v;
+		dpw[v][0] = u;
+		dfs(v, u, level + 1);
+	}
+}
+int q;
+int query(int x, int y) {
+	int hx = treelevel[x], hy = treelevel[y];
+	int ret = 0;
+	while (x != y && hx != hy) {//高度調整到一樣
+		for (int i = 15; i >= 0; i--) {
+			if (abs(hx - hy) >= (1 << i)) {
+				if (hx > hy) {
+					ret = max(ret, dp[x][i]);
+					x = dpw[x][i];
+					hx -= (1 << i);
+				}
+				else {
+					ret = max(ret, dp[y][i]);
+					y = dpw[y][i];
+					hy -= (1 << i);
+				}
+			}
+		}
+	}
+	while (x != y) {//祖先調整到一樣
+		ret = max(ret, dp[x][0]);
+		x = dpw[x][0];
+		hx--;
+		ret = max(ret, dp[y][0]);
+		y = dpw[y][0];
+		hy--;
+	}
+	return ret;
+}
+int main(){
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t;i++){
+		cin >> n >> m;
+		for (int i = 0; i < m; i++)
+			cin >> D[i].x >> D[i].y >> D[i].v;
+		
+		kruscal();
+		memset(dp, 0, sizeof(dp));
+		memset(dpw, 0, sizeof(dpw));
+		dfs(1, -1, 1);
+		int x, y;
+		cin >> q;
+		printf("Case %d\n", i);
+		while (q--){
+			cin >> x >> y;
+			printf("%d\n", query(x, y));
+		}
+		puts("");
+	}
+}
