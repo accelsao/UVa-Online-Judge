@@ -1,0 +1,66 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+int n, m;
+struct edge {
+	int x, y, d;
+	bool operator<(edge a)const {
+		return d < a.d;
+	}
+}D[101];
+int p[101];
+int s[101],c;
+int find(int x) { return x == p[x] ? x : p[x] = find(p[x]); }
+int	kruskal(int d) {
+	int sum = 0;
+	for (int i = 0; i <= n; i++)p[i] = i;
+	for (int i = 0, c = 0; i < m; i++) {
+		if (i == d)continue;
+		int x = find(D[i].x), y = find(D[i].y);
+		if (x == y)continue;
+		sum += D[i].d;
+		if (d == -1)s[c++] = i;
+		p[x] = y;
+	}
+		int num = 0;
+		for (int i = 1; i <= n; i++)
+			if (find(p[i]) == i)num++;
+		return num > 1 ? 1e9 : sum;
+}
+int main() {
+	ios::sync_with_stdio(0), cin.tie(0);
+	int t;
+	cin >> t;
+	for (int k = 1; k <= t;k++) {
+		c = 0;
+		cin >> n >> m;
+		for (int i = 0; i < m; i++) 
+			cin >> D[i].x >> D[i].y >> D[i].d;
+		sort(D, D + m);
+		int a = kruskal(-1), b = 1e9;
+		printf("Case #%d : ", k);
+		if (a == 1e9) {
+			puts("No way"); continue;
+		}
+		for (int i = 0; i < n - 1; i++)//窮舉n-1條邊
+			b = min(b, kruskal(s[i]));
+		
+		if (b == 1e9)puts("No second way");
+		else printf("%d\n", b);
+	}
+
+}
+
