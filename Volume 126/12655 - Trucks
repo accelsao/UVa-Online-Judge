@@ -1,0 +1,112 @@
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+struct edge {
+	int x, y, d;
+	bool operator<(const edge &a)const {return d > a.d;}
+};
+edge D[200001];
+vector<edge>g[200001];
+int  n, m, s,pre[200001];
+int find(int x) { return x == pre[x] ? x : pre[x] = find(pre[x]); }
+void kruscal() {
+	sort(D, D + m);
+	for (int i = 0; i <= n; i++)
+		pre[i] = i, g[i].clear();
+	for (int i = 0; i < m; i++) {
+		int x = find(D[i].x);
+		int y = find(D[i].y);
+		if (x == y)continue;
+		g[D[i].x].push_back(edge{ D[i].x,D[i].y,D[i].d });
+		g[D[i].y].push_back(edge{ D[i].y,D[i].x,D[i].d });
+		pre[x] = y;
+	}
+}
+int dp[1 << 15][20],dpw[1 << 15][20];
+int treelevel[1 << 15], treepath[1 << 15];
+void dfs(int u,int p,int level) {
+	treelevel[u] = level; treepath[level] = u;
+	for (int i = 1; (1 << i) < level; i++) {
+		dp[u][i] = min(dp[u][i - 1], dp[dpw[u][i - 1]][i - 1]);
+		dpw[u][i] = treepath[level - (1 << i)];
+	}
+	for (int i = 0; i < g[u].size(); i++) {
+		int v = g[u][i].y;
+		if (v == p)continue;
+		dp[v][0] = g[u][i].d;
+		dpw[v][0] = u;
+		dfs(v, u, level + 1);
+	}
+}
+int v[200001];
+vector<edge>Q[200001],q;
+int lca[200001];
+void tarjan(int u, int p) {
+	pre[u] = u;
+	for(int i=0;i<g[u].size();i++){
+		int v = g[u][i].y;
+		if (v == p)continue;
+		tarjan(v, u);
+		pre[find(v)] = u;
+	}
+	v[u] = 1;
+	for (int i = 0; i < Q[u].size(); i++) 
+		if (v[Q[u][i].x]) 
+			lca[Q[u][i].y] = find(Q[u][i].x);
+		
+	
+}
+int query(int x, int y, int lca) {
+	int hx = treelevel[x],hy=treelevel[y],hc=treelevel[lca];
+	int ans = 1e9;
+	for (int i = 16; i >= 0; i--) {
+		if (hx - hc >= (1 << i))
+			ans = min(ans, dp[x][i]), x = dpw[x][i], hx -= (1 << i);
+		if (hy - hc >= (1 << i))
+			ans = min(ans, dp[y][i]), y = dpw[y][i], hy -= (1 << i);
+	}
+	return ans;
+}
+int main() {
+	while (cin >> n >> m >> s) {
+		q.clear();
+		for (int i = 0; i < m; i++)
+			cin >> D[i].x >> D[i].y >> D[i].d;
+		kruscal();
+		memset(dpw, 0, sizeof(dpw));
+		memset(dp, 0, sizeof(dp));
+		dfs(1, -1, 1);
+		for (int i = 0; i <= n; i++)
+			v[i] = 0, Q[i].clear();
+		int x, y;
+		for (int i = 0; i < s; i++) {
+			cin >> x >> y;
+			Q[x].push_back(edge{ y,i,-1 });
+			Q[y].push_back(edge{ x,i ,-1});
+			q.push_back(edge{ x, y,-1 });
+		}
+		tarjan(1, -1);
+		for (int i = 0; i < s; i++)
+			printf("%d\n", query(q[i].x, q[i].y, lca[i]));
+		
+	}
+}
+
+/*
+最小邊最大的路徑中最小邊
+
+*/
