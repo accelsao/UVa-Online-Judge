@@ -16,13 +16,13 @@ using namespace std;
 
 typedef pair<string, int> a;
 a p[100001];
-int w[100001],h[100001];
+int w[100001], h[100001];
 int d[100001][20], n;
 void rmq() {
 	for (int i = 0; i < n; i++)d[i][0] = h[i];
 	for (int j = 1; (1 << j) <= n; j++)//長度
-		for (int i = 0; i + (i << j) - 1 < n; i++)
-			d[i][j] = min(d[i][j - 1], d[i + (i << (j-1))][j - 1]);
+		for (int i = 0; i + (1 << j) - 1 < n; i++)
+			d[i][j] = min(d[i][j - 1], d[i + (1 << (j - 1))][j - 1]);
 }
 int lcp(int l, int r) {
 	l--, r--;
@@ -35,7 +35,7 @@ int lcp(int l, int r) {
 	int k = 0;
 	while ((1 << (k + 1)) <= r - l + 1)k++;
 	//(1<<k)長度
-	return min(d[l][k], d[r - (1<< k) + 1][k]);
+	return min(d[l][k], d[r - (1 << k) + 1][k]);
 }
 int main() {
 	ios::sync_with_stdio(0);
