@@ -140,3 +140,76 @@ int main() {
 		}
 	}
 }
+----------------------------------------------------LCP後綴數組,RMQ
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+typedef pair<string, int> a;
+a p[100001];
+string s[100001];
+int w[100001], h[100001];
+int d[100001][20], n;
+void rmq() {
+	for (int i = 0; i < n; i++)d[i][0] = h[i];
+	for (int j = 1; (1 << j) <= n; j++)//長度
+		for (int i = 0; i + (1 << j) - 1 < n; i++)
+			d[i][j] = min(d[i][j - 1], d[i + (1 << (j - 1))][j - 1]);
+}
+int lcp(int l, int r) {
+	l--, r--;
+	if (l == r)return s[l].size();
+	l = w[l], r = w[r];//換成排序後的序數
+	if (l > r)swap(l, r);
+	//LCP_length(lth, rth) = min(lcparray[l+1], ..., lcpa[r])
+	//每個lcpa儲存 i 和 i-1的 lcplenth 從 l+1~r尋找min lcplenth 相當於尋找lcp(l,r)
+	l++;
+	int k = 0;
+	while ((1 << (k + 1)) <= r - l + 1)k++;
+	//(1<<k)長度
+	return min(d[l][k], d[r - (1 << k) + 1][k]);
+}
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int t;
+	cin >> t;
+	for (int i = 1; i <= t; i++) {
+		cin >> n;
+		for (int i = 0; i < n; i++) {
+			cin >> p[i].first;
+			s[i] = p[i].first;
+			p[i].second = i;
+		}
+		sort(p, p + n);
+		for (int i = 0; i < n; i++) {
+			w[p[i].second] = i;
+			if (!i)continue;
+			int len = min(p[i - 1].first.size(), p[i].first.size());
+			int j;
+			for (j = 0; j < len; j++)
+				if (p[i - 1].first[j] != p[i].first[j])break;
+			h[i] = j;
+		}
+		rmq();
+		cin >> n;
+		int x, y;
+		printf("Case %d:\n", i);
+		while (n--) {
+			cin >> x >> y;
+			printf("%d\n", lcp(x, y));
+		}
+	}
+}
