@@ -1,0 +1,58 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+int p[26][26] = {};
+int d[26] = {};
+int main(){
+	string s;
+	int sum;
+	while (cin >> s){
+		sum = 0;
+		for (int i = 0; i < 26; i++){
+			for (int j = 0; j < 26; j++)
+				p[i][j] = 1e9;
+			d[i] = 0;
+		}
+		int len = s.size();
+		int i = s[0] - 'a', j = s[len - 1] - 'a';
+		p[i][j] = min(len, p[i][j]);
+		p[j][i] = min(len, p[j][i]);
+		d[i]++, d[j]++;
+		sum += len;
+		while (cin >> s, s != "deadend"){
+			len = s.size();
+			i = s[0] - 'a', j = s[len - 1] - 'a';
+			p[i][j] = min(len, p[i][j]);
+			p[j][i] = min(len, p[j][i]);
+			d[i]++, d[j]++;
+			sum += len;
+		}
+		int x = 0, odd[2];
+		for (int i = 0; i < 26; i++)
+			if (d[i] & 1)
+				odd[x++] = i;
+		if (x){
+			for (int k = 0; k < 26; k++)
+				for (int i = 0; i < 26; i++)
+					for (int j = 0; j < 26; j++)
+						p[i][j] = min(p[i][k] + p[k][j], p[i][j]);
+			sum += p[odd[0]][odd[1]];
+		}
+		printf("%d\n", sum);
+	}
+}
