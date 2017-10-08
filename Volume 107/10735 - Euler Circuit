@@ -1,4 +1,22 @@
-/*struct edge{
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+#include<stack>
+using namespace std;
+
+
+struct edge{
 	int to, cap, pre;
 	bool real;
 };
@@ -14,7 +32,7 @@ int s, t;
 int bfs(){
 	queue<int>q;
 	q.push(0);
-	for (int i = 0; i <=t; i++)a[i] = -1;
+	for (int i = 0; i <= t; i++)a[i] = -1;
 	a[0] = 0;
 	while (!q.empty()){
 		int u = q.front(); q.pop();
@@ -47,7 +65,7 @@ int dfs(int u, int f){
 int mf(){
 	int flow = 0, f;
 	while (bfs()){
-		for (int i = 0; i <=t; i++)v[i] = 0;
+		for (int i = 0; i <= t; i++)v[i] = 0;
 		while ((f = dfs(s, 1e9)) >0)flow += f;
 	}
 	return flow;
@@ -67,11 +85,11 @@ void euler(int u){
 int main(){
 	int T;
 	cin >> T;
-	while (T--){	
+	while (T--){
 		cin >> n >> m;
 		for (int i = 0; i <= n + 1; i++)
 			d[i] = 0, g[i].clear(), E[i].clear();
-		int x, y;char c;
+		int x, y; char c;
 		s = 0, t = n + 1;
 		for (int i = 0; i < m; i++){
 			cin >> x >> y >> c;
@@ -80,7 +98,7 @@ int main(){
 				g[x].push_back(edge{ y, 1, g[y].size(), 1 });
 				g[y].push_back(edge{ x, 0, g[x].size() - 1, 0 });
 			}
-			else E[x].push_back(eg{ y, 0 });		
+			else E[x].push_back(eg{ y, 0 });
 		}
 		int flag = 0, flow = 0;
 		for (int i = 1; i <= n; i++){
@@ -100,6 +118,7 @@ int main(){
 		}
 		if (flag || mf() != flow){
 			puts("No euler circuit exist");
+			if (T)puts("");
 			continue;
 		}
 		for (int i = 1; i <= n; i++)
@@ -117,4 +136,4 @@ int main(){
 		puts("1");
 		if (T)puts("");
 	}
-}*/
+}
