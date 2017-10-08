@@ -1,0 +1,50 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+using namespace std;
+
+
+
+int n, m;
+int d[201],p[201];
+int find(int x){ return x == p[x] ? x : p[x] = find(p[x]); }
+int main(){
+	int n, m;
+	while (cin >> n >> m){
+		for (int i = 0; i < n; i++)
+			d[i] = 0, p[i] = i;
+		int x, y;
+		for (int i = 0; i < m;i++){
+			cin >> x >> y;
+			d[x]++, d[y]++;
+			x = find(x), y = find(y);
+			if (x != y)
+				p[x] = y;
+		}
+		int c = 0;
+		for (int i = 0; i < n; i++)
+			if (p[i]== i&&d[i])
+				c++;
+		if (c==1&&m>=2){
+			c = 0;
+			for (int i = 0; i < n; i++)
+				if (d[i] & 1){
+					c = 1; break;
+				}
+			puts(!c ? "Possible" : "Not Possible");
+		}
+		else
+			puts("Not Possible");
+	}
+}
