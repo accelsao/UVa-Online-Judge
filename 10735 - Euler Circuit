@@ -1,0 +1,120 @@
+/*struct edge{
+	int to, cap, pre;
+	bool real;
+};
+struct eg{
+	int to, vis;
+};
+vector<eg>E[103];
+vector<edge>g[103];
+int d[103];
+int v[103], a[103];
+int n, m;
+int s, t;
+int bfs(){
+	queue<int>q;
+	q.push(0);
+	for (int i = 0; i <=t; i++)a[i] = -1;
+	a[0] = 0;
+	while (!q.empty()){
+		int u = q.front(); q.pop();
+		for (int i = 0; i < g[u].size(); i++){
+			edge &e = g[u][i];
+			if (e.cap>0 && a[e.to] == -1){
+				a[e.to] = a[u] + 1;
+				q.push(e.to);
+			}
+		}
+	}
+	return ~a[t];//if a[t]==-1 return 0 else return 1
+}
+int dfs(int u, int f){
+	//if (u == t || !f)return f;
+	if (u == t)return f;
+	for (int &i = v[u]; i < g[u].size(); i++){
+		edge &e = g[u][i];
+		if (a[e.to] == a[u] + 1 && e.cap > 0){
+			int d = dfs(e.to, min(f, e.cap));
+			if (d > 0){
+				e.cap -= d;
+				g[e.to][e.pre].cap += d;
+				return d;
+			}
+		}
+	}
+	return 0;
+}
+int mf(){
+	int flow = 0, f;
+	while (bfs()){
+		for (int i = 0; i <=t; i++)v[i] = 0;
+		while ((f = dfs(s, 1e9)) >0)flow += f;
+	}
+	return flow;
+}
+stack<int>stk;
+//int find(int x){ return x == p[x] ? x : p[x] = find(p[x]); }
+void euler(int u){
+	for (int i = 0; i < E[u].size(); i++){
+		eg &e = E[u][i];
+		if (!e.vis){
+			e.vis = 1;
+			euler(e.to);
+			stk.push(u);
+		}
+	}
+}
+int main(){
+	int T;
+	cin >> T;
+	while (T--){	
+		cin >> n >> m;
+		for (int i = 0; i <= n + 1; i++)
+			d[i] = 0, g[i].clear(), E[i].clear();
+		int x, y;char c;
+		s = 0, t = n + 1;
+		for (int i = 0; i < m; i++){
+			cin >> x >> y >> c;
+			d[x]++, d[y]--;//+為出 -為入
+			if (c == 'U'){
+				g[x].push_back(edge{ y, 1, g[y].size(), 1 });
+				g[y].push_back(edge{ x, 0, g[x].size() - 1, 0 });
+			}
+			else E[x].push_back(eg{ y, 0 });		
+		}
+		int flag = 0, flow = 0;
+		for (int i = 1; i <= n; i++){
+			if (d[i] & 1){
+				flag = 1; break;
+			}
+			//出 s->x 入 x->t
+			if (d[i]>0){
+				g[s].push_back(edge{ i, d[i] / 2, g[i].size(), 1 });//改變一條度數改變2 因此d[i] 要改變d[i]/2條 (d[i]必偶數否則無解)
+				g[i].push_back(edge{ s, 0, g[s].size() - 1, 0 });
+				flow += d[i] / 2;
+			}
+			else if (d[i]){
+				g[i].push_back(edge{ t, -d[i] / 2, g[t].size(), 1 });
+				g[t].push_back(edge{ i, 0, g[i].size() - 1, 0 });
+			}
+		}
+		if (flag || mf() != flow){
+			puts("No euler circuit exist");
+			continue;
+		}
+		for (int i = 1; i <= n; i++)
+			for (int j = 0; j < g[i].size(); j++){
+				edge &e = g[i][j];
+				if (e.real&&e.to <= n)//將定向的無向圖加入 dfs找路
+					if (e.cap>0)E[i].push_back(eg{ e.to, 0 });
+					else E[e.to].push_back(eg{ i, 0 });
+			}
+		euler(1);
+		while (!stk.empty()){
+			printf("%d ", stk.top());
+			stk.pop();
+		}
+		puts("1");
+		if (T)puts("");
+	}
+}*/
