@@ -1,0 +1,65 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+#include<stack>
+using namespace std;
+
+
+int n, m;
+int d[20];
+int p[20][20];
+int odd[20];
+int dp[1 << 18];
+int f(int s, int k){
+	if (!s)return 0;
+	if (dp[s] != -1)return dp[s];
+	dp[s] = 1e9;
+	for (int i = 0; i < k; i++){
+		if (s&(1 << i)){
+			for (int j = i + 1; j < k; j++)
+				if (s&(1 << j))
+					dp[s] = min(f(s - (1 << i) - (1 << j), k) + p[odd[i]][odd[j]], dp[s]);
+			break;//其他已經找過 加速
+		}
+	}
+	return dp[s];
+}
+int main(){
+	while (cin >> n >> m,n){
+		for (int i = 1; i <= n; i++){
+			for (int j = 1; j <= n; j++)
+				p[i][j] = p[j][i] = 1e9;
+			d[i] = 0;
+		}
+		memset(dp, -1, sizeof(dp));
+		int x, y, z;
+		int sum = 0;
+		for (int i = 0; i < m; i++){
+			cin >> x >> y >> z;
+			p[x][y] = min(p[x][y], z);
+			p[y][x] = min(p[y][x], z);
+			d[x]++, d[y]--;
+			sum += z;
+		}
+		for (int k = 1; k <= n; k++)
+			for (int i = 1; i <= n; i++)
+				for (int j = 1; j <= n; j++)
+					p[i][j] = min(p[i][j], p[i][k] + p[k][j]);
+		int cnt = 0;
+		for (int i = 1; i <= n; i++)
+			if (d[i] & 1)
+				odd[cnt++] = i;
+		printf("%d\n", sum + f((1 << cnt) - 1, cnt));
+	}
+}
