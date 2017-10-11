@@ -1,0 +1,38 @@
+#include <iostream>
+#include<algorithm>
+#include<vector>
+#include<map>
+using namespace std;
+
+struct beep {
+	int x, y;
+}p[12];
+int d[12][12];
+int dp[1<<12][12];
+int k;
+int TSP(int state, int pre) {
+	if (!state&&pre)return 1e9;
+	if (dp[state][pre] != 1e9)return dp[state][pre];
+	for (int i = 0; i <= k; i++) 
+		if (state&(1 << i)) 
+			dp[state][pre] = min(dp[state][pre], TSP(state ^ (1 << i), i) + d[i][pre]);
+	return dp[state][pre];
+}
+int main() {
+	int t;
+	cin >> t;
+	int r, c;
+	while (t--) {
+		cin >> r >> c >> p[0].x >> p[0].y >> k;
+		for (int i = 1; i <= k; i++)
+			cin >> p[i].x >> p[i].y;
+		for (int i = 0; i <= k; i++)
+			for (int j = 0; j <= k; j++) 
+				d[i][j] = abs(p[i].x - p[j].x) + abs(p[i].y - p[j].y);
+		for (int i = 0; i < (1 << (k + 1)); i++)
+			for (int j = 0; j <= k; j++)
+				dp[i][j] = 1e9;
+		dp[0][0] = 0;
+		printf("The shortest path has length %d\n", TSP((1 << (k + 1)) - 1, 0));
+	}
+}
