@@ -1,0 +1,91 @@
+#include <iostream>
+#include<algorithm>
+#include<vector>
+#include<map>
+#include<queue>
+#include<string>
+#include<cstring>
+#include<sstream>
+using namespace std;
+
+int r, c, k;
+int dp[1 << 12][12];
+char g[55][55];
+int dx[] = { 0,0,1,1,1,-1,-1,-1 };
+int dy[] = { 1,-1,0,1,-1,0,1,-1 };
+int dis[55][55];
+int vis[55][55];
+int b[55][55];
+int p[55][55];
+void bfs(int x, int y) {
+	queue<pair<int, int>>q;
+	int dx[] = { 0,0,1,-1 };
+	int dy[] = { 1,-1,0,0 };
+	memset(vis, 0,sizeof(vis));
+	q.push({ x,y });
+	int st = p[x][y];
+	if (b[x][y])return;
+	while (!q.empty()) {
+		x = q.front().first, y = q.front().second; q.pop();
+		for (int k = 0; k < 4; k++) {
+			int tx = x + dx[k], ty = y + dy[k];
+			if (tx < 0 || ty < 0 || tx >=r || ty >= c)
+				continue;
+			if (b[tx][ty])continue;
+			if (g[tx][ty] == '!' || g[tx][ty] == '.') {
+				if (!vis[tx][ty]) {
+					vis[tx][ty] = vis[x][y] + 1;
+					q.push({ tx,ty });
+					if (g[tx][ty] == '!')
+						dis[st][p[tx][ty]] = vis[tx][ty];
+				}
+			}
+
+		}
+	}
+}
+int dfs(int s, int pre) {
+	int &ans = dp[s][pre];
+	if (ans != -1)return ans;
+	if (!s)return dis[pre][0];
+	ans = 1e9;
+	for (int i = 0; i < k; i++) {
+		if (s&(1 << i))
+			ans = min(ans, dfs(s ^ (1 << i), i) + dis[pre][i]);
+	}
+	return ans;
+}
+int main() {
+	while (cin >> r >> c, r + c) {		
+		k = 0;
+		memset(dp, -1, sizeof(dp));
+		memset(b, 0, sizeof(b));
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < c; j++) {
+				cin >> g[i][j];
+				if (g[i][j] == '@')g[i][j] = '!';
+				if (g[i][j] == '!')p[i][j] = k++;
+				if (g[i][j] == '*') 
+					for (int kk = 0; kk < 8; kk++) {
+						int tx = i + dx[kk], ty = j + dy[kk];
+						if (tx < 0 || ty < 0 || tx >= r || ty >= c)
+							continue;
+						//g[tx][ty] = '#';
+						b[tx][ty] = 1;
+					}
+			}
+		}
+		for (int i = 0; i < k; i++) 
+			for (int j = 0; j <k; j++)
+				dis[i][j] = 1e9;
+		
+		for (int i = 0; i < r; i++)
+			for (int j = 0; j < c; j++)
+				if (g[i][j] == '!')
+					bfs(i, j);
+		int ans = dfs((1 << k) - 1-1, 0);
+		if (ans == 1e9)ans = -1;
+		if (k == 1)ans = 0;//只有出發點 不可能出現無解情形
+		printf("%d\n", ans);
+	}
+}
