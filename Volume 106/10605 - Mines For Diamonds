@@ -1,0 +1,113 @@
+#include <iostream>
+#include<algorithm>
+#include<vector>
+#include<map>
+#include<queue>
+#include<string>
+#include<cstring>
+#include<sstream>
+using namespace std;
+
+
+
+
+char g[20][20];
+int gv[20][20], n, m, s;
+int h[20][20], h2[20];
+int dp[1 << 15][15];
+int idx;
+void bfs(int x, int y) {
+	int nd = gv[x][y], i, j;
+	int used[20][20] = {};
+	int tx, ty;
+	int dx[] = { 0,0,1,-1 };
+	int dy[] = { 1,-1,0,0 };
+	queue<int> X, Y;
+	X.push(x), Y.push(y);
+	used[x][y] = 1;
+	h[nd][nd] = 0;
+	h2[nd] = 1e9;
+	while (!X.empty()) {
+		x = X.front(), X.pop();
+		y = Y.front(), Y.pop();
+		for (i = 0; i < 4; i++) {
+			tx = x + dx[i], ty = y + dy[i];
+			if (tx < 0 || ty < 0 || tx >= n || ty >= m)
+				continue;
+			if (used[tx][ty])
+				continue;
+			if (g[tx][ty] == '#') 
+				h2[nd] = min(h2[nd], used[x][y]);
+			else {
+				used[tx][ty] = used[x][y] + 1;
+				if (g[tx][ty] == '*')
+					h[nd][gv[tx][ty]] = used[x][y];
+				X.push(tx), Y.push(ty);
+			}
+		}
+	}
+}
+/*int dfs(int s, int pre) {
+	if (dp[s][pre] != -1)return dp[s][pre];
+	if (!s) {
+		int a=h2[pre];
+		for (int i = 0; i < idx; i++)
+			if (i != pre)
+				a = min(a, h[i][pre]);
+		return a;
+	}
+	dp[s][pre] = 1e9;
+	for (int i = 0; i < idx; i++)
+		if (s&(1 << i))
+			dp[s][pre] = min(dp[s][pre], dfs(s ^ (1 << i), i) + min(h2[i], h[pre][i]));
+	return dp[s][pre];
+}*/
+#define scanf scanf_s
+int main() {
+	int T, i, j;
+	cin >> T;
+	while (T--) {
+		cin >> n >> m;
+		idx = 0;
+		for (i = 0; i < n; i++) 
+			for (j = 0; j < m; j++) {
+				cin >> g[i][j];
+				if (g[i][j] == '*')
+					gv[i][j] = idx++;
+			}
+		for (int i = 0; i < (1 << idx); i++)
+			for (int j = 0; j < idx; j++)
+				dp[i][j] = 1e9;
+		for (i = 0; i < n; i++)
+			for (j = 0; j < m; j++)
+				h[i][j] = 1e9;
+		for (i = 0; i < n; i++)
+			for (j = 0; j < m; j++)
+				if (g[i][j] == '*')
+					bfs(i, j);
+		dp[0][0] = 0;
+		for (int i = 0; i < idx; i++)
+			dp[1 << i][i] = h2[i];
+		int dw[1 << 12], f[1 << 12];
+		for (int i = 0; i < (1 << idx); i++)
+			dw[i] = f[i] = 1e9;
+		for (int s = 1; s < (1 << idx); s++){
+			for (int j = 0; j < idx; j++)
+				if (s&(1 << j)){
+					for (int z = 0; z < idx; z++)
+						if ((s&(1 << z)) && z != j)
+							dp[s][j] = min(dp[s][j], dp[s ^ (1 << j)][z] + h[j][z]);
+				}
+			for (int j = 0; j < idx; j++)
+				dw[s] = min(dw[s], dp[s][j]);
+		}
+		f[0] = 0;
+		for (int i = 1; i < (1 << idx); i++)
+			for (int j = 1; j <= i; j++)
+				if ((i & j) == j)
+					f[i] = min(f[i], f[i ^ j] + dw[j]);
+
+		printf("%d\n", f[(1 << idx) - 1]);
+	}
+}
+
