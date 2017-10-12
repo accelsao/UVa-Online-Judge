@@ -1,0 +1,68 @@
+#include <iostream>
+#include<algorithm>
+#include<vector>
+#include<map>
+#include<queue>
+#include<string>
+#include<cstring>
+#include<sstream>
+using namespace std;
+
+int r, c, k;
+char m[25][25];
+int dw[8][2] = { {0,1},{1,1} ,{1,0} ,{1,-1},{0,-1},{-1,-1},{-1,0},{-1,1} };
+int p[25][25];
+int dp[1 << 16][16];
+int dis[16][16];
+int v[25][25];
+void bfs(int x,int y) {
+	queue<pair<int, int>>q;
+	q.push({ x,y });
+	memset(v, 0, sizeof(v));
+	int st = p[x][y];
+	while (!q.empty()) {
+		x = q.front().first, y = q.front().second;
+		q.pop();
+		for (int k = 0; k < 8; k++) {
+			int tx = x + dw[k][0], ty = y + dw[k][1];
+			if (tx < 0 || ty < 0 || tx >= r || ty >= c||v[tx][ty])continue;
+			v[tx][ty] = v[x][y] + 1;
+			q.push({ tx,ty });
+			if (m[tx][ty] == '#') 
+				dis[st][p[tx][ty]] = v[tx][ty];
+		}
+	}
+}
+int dfs(int s, int pre) {
+	if (dp[s][pre] != -1)return dp[s][pre];
+	if (!s)return dis[pre][0];
+	dp[s][pre] = 1e9;
+	for (int i = 0; i < k; i++)
+		if (s&(1 << i))
+			dp[s][pre] = min(dp[s][pre], dfs(s ^ (1 << i), i) + dis[pre][i]);
+	return dp[s][pre];
+}
+int main() {
+
+	while (cin >> r >> c) {
+		memset(dp, -1, sizeof(dp));
+		k = 0;
+		for (int i = 0; i < r; i++)
+			for (int j = 0; j < c; j++) {
+				cin >> m[i][j];
+				if (m[i][j] == 'L' || m[i][j] == '#')
+					p[i][j] = k++, m[i][j] = '#';
+			}
+		for (int i = 0; i < k; i++)
+			for (int j = 0; j < k; j++)
+				dis[i][j] = 1e9;
+		for (int i = 0; i < r; i++)
+			for (int j = 0; j < c; j++)
+				if (m[i][j] == '#')
+					bfs(i, j);
+		1;
+		int ans = dfs((1 << k) - 2, 0);
+		if (k == 1)ans = 0;
+		printf("%d\n", ans);
+	}
+}
