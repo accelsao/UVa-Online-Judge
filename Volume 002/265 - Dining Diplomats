@@ -1,0 +1,102 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+#include<stack>
+using namespace std;
+
+struct state{
+	string name, lng;
+	set<string>g;
+	int lng_m[128];
+	int read(){
+		string s;
+		if (getline(cin, s)){
+			g.clear();
+			stringstream ss(s);
+			ss >> name >> lng;
+			while (ss >> s)
+				g.insert(s);
+			g.insert(name);//聽說邦交國一定有自己國家的人..真是神奇阿
+			memset(lng_m, 0, sizeof(lng_m));
+			for (int i = 0; i < lng.size(); i++)
+				lng_m[lng[i]] = 1;
+			return 1;
+		}
+		else return 0;
+	}
+	int iscom(state a){
+		for (int i = 0; i < 128; i++)
+			if (lng_m[i] && a.lng_m[i])
+				return 1;
+		return 0;
+	}
+	char com(state a){
+		for (int i = 0; i < 128; i++)
+			if (lng_m[i] && a.lng_m[i])
+				return i;
+	}
+
+}C[10];
+struct P{
+	int d, p;
+};
+int g[10][10];
+P dp[1 << 10][10];
+int tsp(int s, int p){
+	if (dp[s][p].d != -1)return dp[s][p].d;
+	int &ans = dp[s][p].d;
+	ans = 0;
+	for (int i = 0; i < 10;i++)
+		if (s&(1 << i) && g[p][i]){
+			int f = tsp(s ^ (1 << i), i);
+			if (!f)continue;
+			dp[s][p].p = i;
+			return 1;
+		}
+	return 0;
+}
+int main(){
+	while (1){
+		for (int i = 0; i < 10; i++)
+			if (!C[i].read())
+				return 0;
+		memset(g, 0, sizeof(g));
+		for (int i = 0; i < 10; i++)
+			for (int j = 0; j < 10; j++)
+				if (C[i].g.count(C[j].name) && C[j].g.count(C[i].name) && C[i].iscom(C[j]))
+					g[i][j] = 1;
+		for (int i = 0; i < (1 << 10); i++)
+			for (int j = 0; j < 10; j++)
+				dp[i][j].d = -1;
+		dp[0][0].d = 1;
+		if (tsp((1 << 10) - 1, 0)){
+			int p = (1 << 10) - 1, q = 0;
+			int s[10];
+			for (int i = 0; i < 10; i++){
+				s[i] = q;
+				q = dp[p][q].p;
+				p ^= (1 << q);
+			}
+			for (int i = 0; i < 10; i++){
+				printf("%d %c ", i + 1, C[s[i]].com(C[s[(i - 1 + 10) % 10]]));
+				cout << C[s[i]].name;
+				printf(" %c\n", C[s[i]].com(C[s[(i + 1 + 10) % 10]]));
+			}
+		}
+		else 
+			puts("NO SOLUTION EXISTS");
+		puts("");
+		getchar();
+	}
+}
