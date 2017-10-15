@@ -1,0 +1,177 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+#include<stack>
+using namespace std;
+
+
+#define N  1<<17
+int color[N];
+int hNext[N], iNode[N], aPos[N];
+int used[N], ns = 0;
+struct Tree{
+	vector<int>g[N];
+	void init(int n){
+		for (int i = 0; i < n; i++)
+			g[i].clear();
+	}
+	void add(int x, int y){
+		g[x].push_back(y);
+		g[y].push_back(x);
+	}
+}tree;
+struct Node{
+	int p, pPos, dep;
+	vector<int>A;
+	vector<int>seg[10];
+	void init(){
+		A.clear();
+		p = -1, dep = 0;
+	}
+}nodes[1 << 18];
+int size[N],dep[N];
+int prepare(int u, int p){
+	//建重邊
+	int sz = 1, mx = -1, hedge = -1;
+	int v, t;
+	for (int i = 0; i < tree.g[u].size(); i++){
+		v = tree.g[u][i];
+		if (v == p)continue;
+		sz += (t = prepare(v, u));//子樹
+		if (mx < t)
+			mx = t, hedge = v;	
+	}
+	hNext[u] = hedge;//最多子樹的子孫點
+	return sz;
+}
+int getSTsize(int n){ 
+	int k = 1;
+	for (; k < n; k <<= 1);
+	return k << 1;//?k
+}
+void buildST(Node &nd, int k, int l, int r){
+	if (l>r)return;
+	if (l == r){
+		nd.seg[color[nd.A[l]]][k] = 1;//建顏色
+		return;
+	}
+	int m = (l + r) / 2;
+	buildST(nd, k << 1, l, m);
+	buildST(nd, k << 1 | 1, m + 1, r);
+	for (int i = 0; i < 10; i++)
+		nd.seg[i][k] = nd.seg[i][k << 1] + nd.seg[i][k << 1 | 1];
+}
+void build(int u, int p){
+	if (used[u] == 0){
+		Node &nd = nodes[++ns];
+		nd.init();
+		for (int i = u; i != -1; i = hNext[i]){
+			used[i] = 1;
+			iNode[i] = ns;
+			aPos[i] = nd.A.size();
+			nd.A.push_back(i);
+		}
+		for (int i = 0; i < 10; i++)
+			nd.seg[i].clear(), nd.seg[i].resize(getSTsize(nd.A.size()), 0);
+		buildST(nd, 1, 0, nd.A.size() - 1);
+		if (p != -1){
+			nd.p = iNode[p], nd.pPos = aPos[p];//鏈的編號,鏈的第幾位
+			nd.dep = nodes[nd.p].dep + 1;
+		}
+	}
+	int v;
+	for (int i = 0; i < tree.g[u].size(); i++){
+		v = tree.g[u][i];
+		if (v == p)continue;
+		build(v, u);
+	}
+}
+void modifyST(Node &nd,int k,int l,int r,int x,int v){
+	if (l == r){
+		for (int i = 0; i < 10; i++)
+			nd.seg[i][k] = 0;
+		nd.seg[v][k]++;
+		return;
+	}
+	int m = (l + r) >> 1;
+	if (x <= m)
+		modifyST(nd, k << 1, l, m, x, v);
+	else
+		modifyST(nd, k << 1 | 1, m + 1, r, x, v);
+	for (int i = 0; i < 10; i++)
+		nd.seg[i][k] = nd.seg[i][k << 1] + nd.seg[i][k << 1 | 1];
+}
+void modify(int u,int color){
+	int x = iNode[u];
+	modifyST(nodes[x], 1, 0, nodes[x].A.size()-1, aPos[u], color);
+}
+int colorsum[10];
+void queryST(Node &nd, int k, int l, int r, int x, int y) {
+	if (x <= l && y >= r) {//l,r 在x,y之間
+		for (int i = 0; i < 10; i++)
+			colorsum[i] += nd.seg[i][k];
+		return;
+	}
+	int mid = (l + r) / 2;
+	if (x <= mid)
+		queryST(nd, k << 1, l, mid, x, y);
+	if (mid < y)
+		queryST(nd, k << 1 | 1, mid + 1, r, x, y);
+
+}
+void search(int u, int v){
+	memset(colorsum, 0, sizeof(colorsum));
+	int x = iNode[u], y = iNode[v];
+	u = aPos[u]; v = aPos[v];
+	while (x != y){
+		if (nodes[x].dep < nodes[y].dep)
+			swap(x, y), swap(u, v);
+		queryST(nodes[x], 1, 0, nodes[x].A.size() - 1, 0, u);
+		u = nodes[x].pPos, x = nodes[x].p;
+	}
+	if (u>v)swap(u, v);
+	queryST(nodes[x], 1, 0, nodes[x].A.size() - 1, u, v);
+	int ans = 0;
+	for (int i = 0; i < 10; i++)
+		ans = max(ans, colorsum[i]);
+	printf("%d\n", ans);
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--){
+		int n, q, x, y;
+		cin >> n >> q;
+		for (int i = 0; i < n; i++)
+			cin >> color[i], color[i]--;//點調整從0開始
+		tree.init(n);//初始tree
+		for (int i = 1; i < n; i++){
+			cin >> x >> y; x--, y--;
+			tree.add(x, y);//建邊
+		}
+		prepare(0, -1);//建重鏈 子點較多的
+		memset(used, 0, sizeof(used));
+		ns = 0;
+		build(0, -1);//著色
+		int cmd, u, v;
+		for (int i = 0; i < q; i++){
+			cin >> cmd >> u >> v;
+			u--, v--;
+			if (!cmd)
+				modify(u, v);
+			else
+				search(u, v);		
+		}
+	}
+}
