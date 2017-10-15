@@ -1,0 +1,32 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+#include<stack>
+using namespace std;
+
+
+int d[10001];
+int main(){
+	ios::sync_with_stdio(0), cin.tie(0);
+	d[1] = 1; d[2] = 2; d[3] = 6, d[4] = 24;
+	for (int i = 5; i < 10001; i++){
+		d[i] = d[i - 1] * i;
+		while (d[i] % 10 == 0)
+			d[i] /= 10;
+		d[i] %= 100000;
+	}
+	int n;
+	while (cin >> n)
+		printf("% 5d -> %d\n", n, d[n]%10);
+}
