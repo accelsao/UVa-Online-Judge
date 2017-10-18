@@ -1,0 +1,143 @@
+#include<iostream>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<cstdio>
+#include<queue>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
+#include<sstream>
+#include<vector>
+#include<functional>
+#include<unordered_map>
+#include<stack>
+using namespace std;
+
+const int maxn = 8;
+int nrows, ncols;
+char a[maxn][maxn], ans[maxn][maxn], grid[maxn][maxn];
+bool solve;
+struct State{//数量很小，用char完全装的下。
+	bool color[8];
+	bool up_left;
+	int ncomps, comp[8];
+	int color_ncomps[2];
+	void normalize(){
+		int ret[9];
+		for (int i = 0; i < 9; i++)
+			ret[i] = -1;
+		ncomps = color_ncomps[0] = color_ncomps[1] = 0;
+		for (int i = 0; i<ncols; i++){
+			if (ret[comp[i]] == -1){
+				ret[comp[i]] = ncomps++;
+				color_ncomps[color[i]]++;
+			}
+			comp[i] = ret[comp[i]];
+		}
+	}
+	unsigned int encode(){//unsigned int 能表示值的个数是2^32,这里最大为16^8=(2^4)^8=2^32,刚好装下。
+		unsigned int key = 0;
+		for (int j = 0; j<ncols; j++) 
+			key = key * 16 + 8 * color[j] + comp[j];
+		return key;
+	}
+	void merge(int a, int b){
+		if (b == a)  return;//省时间
+		for (int j = 0; j<ncols; j++)
+			if (comp[j] == b) 
+				comp[j] = a;	
+	}
+};
+map<unsigned, int >dp[maxn][maxn][2];//unsigned int,int
+const char ch[2] = { 'o','#' };
+/*
+对于无限制的用dp保留，对于有限制的直接搜搜。
+force_color如果为-1代表没有限制，如果为0或1代表必须要涂0或1这种颜色。
+*/
+int DP(int row, int col, State & S, int force_color){
+	if (col == ncols) row++, col = 0;
+	S.normalize();//最小表示
+	if (row == nrows){
+		if (S.color_ncomps[0]>1 || S.color_ncomps[1]>1)  return 0;
+		//这句话似乎是防止那些轮廓线变化时没有消失连通分量但是又不满足题意的情况。
+		if (!solve){
+			for (int i = 0; i<nrows; i++)
+				for (int j = 0; j<ncols; j++)  
+					ans[i][j] = grid[i][j];
+			solve = true;
+		}
+		return 1;
+	}
+	if (row>0 && col>0 && S.color[col] != S.color[col - 1])
+		S.up_left = 0;
+	unsigned int key; 
+	if (force_color<0) 
+		key = S.encode();
+	if (force_color<0 && dp[row][col][S.up_left].count(key)) 
+		return dp[row][col][S.up_left][key];
+	int ret = 0;
+	for (int color = 0; color<2; color++){
+		if (force_color == (color ^ 1)) continue;
+		if (a[row][col] == ch[color ^ 1])  continue;
+		//颜色0 1 表示黑 白，那么只有当原来的颜色(或者不涂)正好和现在填的相反 才是不行的
+		if (row>0 && col>0 && color == S.color[col] && color == S.color[col - 1] && color == S.up_left)  continue;
+
+		grid[row][col] = ch[color];
+
+		State T = S;
+		T.color[col] = color;
+		T.up_left = S.color[col];
+		/*
+		两行，merge，归并。
+		*/
+		T.comp[col] = row>0 && S.color[col] == color ? S.comp[col] : S.ncomps;//容易掉row>0
+		if (col>0 && S.color[col - 1] == color) 
+			T.merge(T.comp[col - 1], T.comp[col]);
+		if (row>0 && S.color[col] != color) {
+			/**S.color[col]!=color这句话是不能掉的，因为仅凭
+			find(T.comp,T.comp+ncols,S.comp[col])==T.comp+ncols这句话
+			不足以判断将推出轮廓线的格子是否是一个独立的连通分量。
+			color相等，一定不是。
+			color不相等，find(T.comp,T.comp+ncols,S.comp[col])==T.comp+ncols，即即使T中找不到
+			与S.col相同编号的格子，退出的格子也可能与其中之一连通，原因是退出的格子在T中的编号被改了。
+			如果S.color[col]!=color，那么find(T.comp,T.comp+ncols,S.comp[col])==T.comp+ncols证明一定是独立的
+			连通分量。
+
+			**/
+			if (find(T.comp, T.comp + ncols, S.comp[col]) == T.comp + ncols) {
+				if (row < nrows - 2 || S.color_ncomps[color ^ 1]>1)  continue;
+				ret += DP(row, col + 1, T, color);
+				continue;
+			}
+		}
+		ret += DP(row, col + 1, T, force_color);
+	}
+	if (force_color<0) 
+		dp[row][col][S.up_left][key] = ret;
+	return ret;
+}
+int main(){
+	int T; cin >> T;
+	while (T--) {
+		cin >> nrows >> ncols;
+		for (int i = 0; i<nrows; i++)
+			for (int j = 0; j < ncols; j++) {
+				cin >> a[i][j];
+				dp[i][j][0].clear();
+				dp[i][j][1].clear();
+			}
+		solve = false;
+		State S;
+		memset(&S, 0, sizeof S);
+		printf("%d\n", DP(0, 0, S, -1));
+		if (solve)
+			for (int i = 0; i < nrows; i++) {
+				for (int j = 0; j < ncols; j++)
+					putchar(ans[i][j]);
+				puts("");
+			}
+		puts("");
+	}
+}
