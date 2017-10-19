@@ -17,49 +17,50 @@ using namespace std;
 
 typedef long long LL;
 const int HASH = 30007;
-const int STATE = 1000010;
-const int MAXD = 15;
+const int STATE = 300;
+const int MAXD = 8;
 const double EPS = 1e-15;
 int n, m;
 double maze[MAXD][MAXD];
 int code[MAXD], ch[MAXD];
 
-void decode(LL st){
+//14
+void decode(int st){
 	for (int i = m; i >= 0; --i){
 		code[i] = st & 7;
 		st >>= 3;
 	}
 }
 
-LL encode(){
-	LL st = 0;
+int encode(){
+	int st = 0;
 	int i, cnt = 1;
 	memset(ch, -1, sizeof(ch));
 	ch[0] = 0, ch[1] = 1;
 	for (i = 0; i <= m; ++i){
 		if (ch[code[i]] == -1)
 			ch[code[i]] = ++cnt;
-		code[i] = ch[code[i]];
+		code[i] = ch[code[i]];//long long 2^63
 		st <<= 3;
 		st |= code[i];
-		//code 最多到7
+		//code 最多到15
 	}
 	return st;
 }
 
 struct HASHMAP{
 	int head[HASH], next[STATE], size;
-	LL state[STATE];
+	int state[STATE];
 	double f[STATE];
 	void clear(){
 		size = 0;
 		memset(head, -1, sizeof(head));
 	}
-	void push(LL st, double ans){
+	void push(int st, double ans){
 		int i;
 		decode(st);
 		for (i = 0; i <= m; ++i)
-			if (code[i] == 1)
+			if (code[i]==1)
 				break;
 		if (i == m + 1) //如果编号为1的连通块不存在，那就不可行
 			return;
@@ -87,12 +88,12 @@ void dp_blank(int i, int j, int cur){
 		decode(hm[cur].state[k]);
 		lef = code[j - 1], up = code[j];
 		if (lef && up){//兩邊都有 連起來
-			if (lef != up){
+			if (lef != up){	//code 都會更新 然後從0開始出現 不同數字算是不同連通塊 所以如果不同連通塊要連通 把數字大的都變小的 
 				if (lef < up)
 					swap(lef, up);
 				for (int t = 0; t <= m; ++t)
 					if (code[t] == lef)
-						code[t] = up;
+						code[t] = up;		
 			}
 		}
 		else{
@@ -134,8 +135,9 @@ double solve(){
 	double ret = 0;
 	for (int i = 0; i < hm[cur].size; ++i){
 		decode(hm[cur].state[i]);
-		if (code[m] == 1)
+		if (code[m] == 1) //都連通
 			ret += hm[cur].f[i];
+		
 	}
 	return ret;
 }
@@ -161,6 +163,5 @@ int main(){
 			for (int j = 1; j <= m; ++j)
 				cin >> maze[i][j];
 		work();
-		if (T)puts("");
 	}
 }
