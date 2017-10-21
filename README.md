@@ -23,3 +23,6 @@ Here are some uva problem solutions
 hamilton euler postman 暫時結束
 回到樹鍊剖分..難阿
 17/10/15
+
+插頭DP真他X的難...ㄏㄏ
+17/10/21
