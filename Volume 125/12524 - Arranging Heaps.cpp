@@ -63,3 +63,26 @@ int main(){
 		printf("%lld\n", dp[n][m]);
 	}
 }
+
+/*
+n堆東西 集中到某一堆最小cost cost為 兩堆相差*w
+
+dp[i][j]=表示放入 i 堆，集中 j 堆的最少花費 
+dp[i][j]=min{dp[k][j-1]+cost(k,i)}(1<=k<i,cost(k,i) k+1~i 轉到i 所需的cost)
+cost(k*i)=(p[i].h-p[i].h)*p[i].w+(p[i].h-p[i-1].h)*p[i-1].w....(p[i]-p[k+1])*p[k+1]
+sw[i]=sum(p[k].w)(1<=k<=i)
+sxw[i]=sum(p[k].h*p[k].w)(1<=k<=i)
+dp[i][j]=min(dp[k][j-1]+p[i].h*(sw(i)-sw(k)) -(sxw[i]-sxw[k]))
+->move
+【dp[k][j-1] + sxw[k]】 =  【p[i].h 】* 【sw[k]】  +   【 dp[i][j] +  sxw[i] -sw[i]*p[i].h】 ;
+
+y=a*x+b
+y=dp[k][j-1] + sxw[k] ;
+x = sw[k]; a = p[i].h ;
+b = dp[i][j] +  sm[i] -sw[i]*p[i].h;
+
+題目給的 p[i].h遞增
+斜率遞增
+因此希望常數b 越大越好
+
+*/
