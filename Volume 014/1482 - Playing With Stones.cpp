@@ -25,10 +25,12 @@ using namespace std;
 	SG[0] = 0;
 	for (int i = 1; i < 50; i++) {
 		memset(mex, 0, sizeof(mex));
-		for (int j = 1; j <= i / 2; j++)
-			mex[SG[i - j]] = 1;
+		for (int j = 1; j <= i; j++) {
+			if (i >= j)
+				mex[SG[i - j]] = 1;//在後繼集合為1
+		}
 		int sg = 0;
-		for (sg = 0; mex[sg]; sg++);
+		for (sg = 0; mex[sg]; sg++);//不在集合中的最小值 為sg值
 		SG[i] = sg;
 		printf("%d : %d\n", i, SG[i]);
 	}
