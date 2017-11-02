@@ -82,4 +82,4 @@ int main(){
 
 	}
 }
-參考 http://knightzone.org/?p=2017
+//參考 http://knightzone.org/?p=2017
