@@ -21,10 +21,10 @@ using namespace std;
 
 char E[500005];
 int f[500005];
-void pre(char *p, int len){
+void pre(char *p, int len) {
 	int i, j;
-	for (i = 1, j = f[0] = -1; i < len; i++){
-	
+	for (i = 1, j = f[0] = -1; i < len; i++) {
+
 		while (j >= 0 && p[j + 1] != p[i])
 			j = f[j];
 		if (p[j + 1] == p[i])
@@ -32,13 +32,13 @@ void pre(char *p, int len){
 		f[i] = j;
 	}
 }
-int KMP(string t,char p[],int tlen,int plen){
+int KMP(string t, char p[], int tlen, int plen) {
 	int i, j, c = 0;
-	for (i = 0, j = -1; i < tlen; i++){
+	for (i = 0, j = -1; i < tlen; i++) {
 		while (j >= 0 && p[j + 1] != t[i])
 			j = f[j];
 		if (p[j + 1] == t[i])j++;
-		if (j == plen - 1){
+		if (j == plen - 1) {
 			c++;
 			j = f[j];
 			if (c >= 2)return c;
@@ -46,16 +46,17 @@ int KMP(string t,char p[],int tlen,int plen){
 	}
 	return c;
 }
-int main(){
+int main() {
+	accel;
 	string a, s, w;
 	int n;
 	cin >> n;
-	while (n--){
-		cin >> a >> s >> w;
+	while (n--) {
+		cin >> a >> w >> s;
 		int c[1024] = {}, ans[1024] = {}, id = 0;
 		for (int i = 0; i < a.size(); i++)
 			c[a[i]] = i;
-		for (int i = 0; i < a.size(); i++){
+		for (int i = 0; i < a.size(); i++) {
 			for (int j = 0; j < w.size(); j++)
 				E[j] = a[(c[w[j]] + i) % a.size()];
 			E[w.size()] = '\0';
@@ -68,7 +69,7 @@ int main(){
 			puts("no solution");
 		else if (id == 1)
 			printf("unique: %d\n", ans[0]);
-		else{
+		else {
 			printf("ambiguous:");
 			for (int i = 0; i < id; i++)
 				printf(" %d", ans[i]);
