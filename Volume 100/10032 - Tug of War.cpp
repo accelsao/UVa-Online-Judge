@@ -1,44 +1,53 @@
 #include<iostream>
+#include<cmath>
 #include<algorithm>
-#include<map>
-#include<string>
+#include<cstring>
 #include<cstdio>
 #include<queue>
-#include<cmath>
-#include<stack>
-#include<cctype>
+#include<string>
+#include<map>
+#include<set>
+#include<string>
 #include<sstream>
+#include<vector>
+#include<stack>
+#include<ctime>
+#include<vector>
+#define Accel ios::sync_with_stdio(0), cin.tie(0), cout.tie(0)
+#define LL long long
+#define Re(a,b) memset(a,b,sizeof(a))
+#define N
+#define M
 using namespace std;
 
-
-//人數至多50人 用longlong 64元素
-int main(){
+LL dp[30000];
+int p[101];
+int main() {
+	Accel;
 	int t;
-	int p[101];
 	cin >> t;
-	while (t--){
-		int n;
+	while (t--) {
+		int n, s = 0;
 		cin >> n;
-		int tot = 0;
 		for (int i = 0; i < n; i++)
-			cin >> p[i], tot += p[i];
-		int hs = tot / 2;//1隊重量上限
-		int hn = n / 2;//人數上限
-		long long dp[45000+1] = {};//重量
-		for (int i = 1; i <= hs; i++)dp[i] = 0;
+			cin >> p[i], s += p[i];
+		Re(dp, 0);
+		int w = s / 2, hn = n / 2;
 		dp[0] = 1;
-		for (int i = 0; i < n; i++)
-			for (int j = hs; j >= p[i]; j--)
+		for (int i = 0; i < n; i++) {
+			for (int j = w; j >= p[i]; j--) 
 				dp[j] |= dp[j - p[i]] << 1LL;
-		if (n % 2)//奇數 檢查 n/2(hn) 和 n/2+1  ex: 3 有 1或2人的可能 
-			while (!(dp[hs] & (1LL << hn)) && !(dp[hs] & (1LL << (hn + 1))))
-				hs--;
-		else//偶數只有平分可能  其他相差會>1
-			while (!(dp[hs] & (1LL << hn)))
-				hs--;
 
-		printf("%d %d\n", hs, tot - hs);
-		if (t)
-			puts("");
+			//cout << dp[p[i]] << endl;
+		}
+		if (n & 1)
+			while (!(dp[w] & (1LL << hn)) && !(dp[w] & (1LL << (hn + 1))))
+				w--;
+		else
+			while (!(dp[w] & (1LL<<hn)))
+				w--;
+		
+		printf("%d %d\n", w, s - w);
+		if (t)puts("");
 	}
 }
