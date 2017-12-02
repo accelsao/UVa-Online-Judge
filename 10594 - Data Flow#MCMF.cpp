@@ -73,6 +73,6 @@ int main(){
 		}
 		add(0, 1, D, 0);
 		if (mcmf(0, n) < D)puts("Impossible.");
-		else printf("%I64d\n", cost);
+		else printf("%lld\n", cost);
 	}
 }
