@@ -1,14 +1,16 @@
 # Problem statement
 Given N receptacles,M numbers of device, K adapters  
-The store sells adapters that allow one type of plug to be used in a different type of outlet. Moreover,  
-adapters are allowed to be plugged into other adapters.  
-The store does not have adapters for all possible combinations of plugs  
-and receptacles, but there is essentially an unlimited supply of the ones they do have.  
+The store sells adapters that allow one type of plug to be used in a different type of outlet.
+Moreover,adapters are allowed to be plugged into other adapters.  
+The store does not have adapters for all possible combinations of plugs and receptacles, but there is essentially an unlimited supply of the ones they do have.  
 You want the device be plugged as many as possible  
 print the minimum unplugged device  
 # Input  
 <a href="https://www.codecogs.com/eqnedit.php?latex=1\leq&space;n,m,k\leq&space;100" target="_blank"><img src="https://latex.codecogs.com/gif.latex?1\leq&space;n,m,k\leq&space;100" title="1\leq n,m,k\leq 100" /></a>  
 # Solution
+There might be at most 400 types  
+adapters can combine A-B B->C C->D ,now A is type D  
+and there are infinte number of adapters ,and K types  
 Max Bipartite Match can be solve by max-flow  
 check whether A can adapte to B by floyd warshall  
 max-flow  s-source,t-sink
