@@ -14,7 +14,7 @@
 #define SZ(a) ((int)a.size())
 //#pragma GCC optimize(2)
 using namespace std;
-const int N=1e6+1;
+const int N=1e5+1;
 const int M=998244353;
 const double eps=1e-6;
 typedef complex<double>C;
@@ -39,128 +39,42 @@ const double PI(acos(-1.0));
 
 
 int t;
-string s;
+int d[N];
 int main(){
 	
 	//freopen("01.txt","w",stdout);
 	
 	cin>>t;
+	int n;
 	while(t--){
-		int k;
-		cin>>k;
-		int g[5][26]={};
-		int h[5][26]={};
-		
-		for(int i=0;i<6;i++){
-			cin>>s;
-			for(int j=0;j<5;j++){
-				g[j][s[j]-'A']=1;
+		cin>>n;
+		for(int i=1;i<=100000;i++)d[i]=-1;
+		int r=0;
+		int z=0,a;
+		for(int i=1;i<=n;i++){
+			cin>>a;
+			if(d[a]==-1)d[a]=i;
+			else{
+				if(d[a]>=r){
+					r=i;
+					z++;
+					
+				}
+				d[a]=i;
+					
 			}
 		}
-		for(int i=0;i<6;i++){
-			cin>>s;
-			for(int j=0;j<5;j++){
-				h[j][s[j]-'A']=1;
-			}
-		}
-		vector<int>d[5];
-		int z=1;
-		for(int j=0;j<5;j++){
-			for(int i=0;i<26;i++){
-				if(g[j][i]+h[j][i]==2)
-					d[j].push_back(i);
-			}
-			z*=d[j].size();
-		}
-		
-//		for(int i=0;i<5;i++){
-//			cout<<d[i].size()<<": ";
-//			for(auto x:d[i]){
-//				char c='A'+x;
-//				cout<<c<<" ";
-//			}
-//			cout<<endl;
-//		}
-		if(z<k){
-			cout<<"NO\n";
-			continue;
-		}
-		k--;
-		//cout<<z<<endl;
-		z/=d[0].size();
-		for(int j=1;j<5;j++){
-			int c = k/z;
-			//printf("%d / %d : %d\n",k,z,c);
-			k%=z;
-			char ch='A'+d[j-1][c];
-			cout<<ch;
-			z/=d[j].size();
-		}
-		char ch='A'+d[4][k];
-		cout<<ch<<endl;
-		//system("pause");
+		cout<<z<<endl;
+			
 	}
 	
 }
 /*
-
-1
-1
-AYGSU
-DOMRA
-CPFAS
-XBODG
-WDYPK
-PRXWO
-
-BBOPT
-COSBG
-DTRAR
-EPMMS
-FSXNU
-GFGHI
-
-
-
-
 3
-1
-AYGSU
-DOMRA
-CPFAS
-XBODG
-WDYPK
-PRXWO
-CBOPT
-DOSBG
-GTRAR
-APMMS
-WSXNU
-EFGHI
-5
-AYGSU
-DOMRA
-CPFAS
-XBODG
-WDYPK
-PRXWO
-CBOPT
-DOSBG
-GTRAR
-APMMS
-WSXNU
-EFGHI
-64
-FGHIJ
-EFGHI
-DEFGH
-CDEFG
-BCDEF
-ABCDE
-WBXDY
-UWYXZ
-XXZFG
-YYFYH
-EZWZI
-ZGHIJ
+6
+1 2 1 3 1 2
+4
+2 4 2 4
+9
+10 2 2 10 3 4 5 4 3
 */
